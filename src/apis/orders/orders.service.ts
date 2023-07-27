@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { ConcertsService } from '../concert/concerts.service';
 import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
+import { ROLE, User } from '../users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
@@ -16,19 +17,31 @@ export class OrdersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create({ concertId, userId, amount, seatIds }): Promise<string> {
+  async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate) {
     const concert = await this.concertsService.findById({ concertId });
-    console.log(`콘서트 ${concert}`);
+
     if (!concert) throw new HttpException('해당 콘서트를 찾을 수 없습니다.', 404);
     const hostId = concert.user.id;
 
+    // in문을 사용하면 순서대로 반환하나? 순서대로 반환하지 않음,,, 조건문필요
+    const users = await this.usersService.findUsersById({ userIds: [userId, hostId] });
+    let user: User;
+    let hostUser: User;
+    if (users[0].role === ROLE.USER) {
+      user = users[0];
+      hostUser = users[1];
+    } else {
+      user = users[1];
+      hostUser = users[0];
+    }
+    if (user.point < amount) throw new HttpException('포인트 잔액이 부족합니다.', 400);
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction('SERIALIZABLE');
+    await queryRunner.startTransaction();
     try {
       // 트랜젝션
       const manager = queryRunner.manager;
-
       const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
 
       const filteredSeats = seats.filter((seat) => seat.isSoldOut);
@@ -41,12 +54,6 @@ export class OrdersService {
       const orderSeats = await this.ordersRepository.createOrderSeat({ manager, orderId: order.id, seatIds });
       console.log(orderSeats);
       // 유저 돈 차감 호스트 돈 증가
-
-      const [user, hostUser] = await Promise.all([
-        this.usersService.findOneWithManager({ manager, id: userId }),
-        this.usersService.findOneWithManager({ manager, id: hostId }),
-      ]);
-      if (user.point < amount) throw new HttpException('포인트 잔액이 부족합니다.', 400);
 
       await Promise.all([
         this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false }),
@@ -64,9 +71,11 @@ export class OrdersService {
     }
   }
 
-  async orderCancel({ orderId, userId }) {
+  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<string> {
     const order = await this.ordersRepository.findOne({ orderId });
     if (order.user.id !== userId) throw new HttpException('주문취소 권한이 없습니다', 401);
+    if (order.status === ORDERSTATUS.CANCEL) throw new ConflictException('이미 취소된 결제입니다.');
+
     const orderSeats = order.orderSeats;
 
     const nowTime = new Date().getTime();
@@ -76,6 +85,17 @@ export class OrdersService {
 
     const seatIds = orderSeats.map((orderSeat) => orderSeat.seat.id);
     const hostId = order.concert.user.id;
+
+    const users = await this.usersService.findUsersById({ userIds: [userId, hostId] });
+    let user: User;
+    let hostUser: User;
+    if (users[0].role === ROLE.USER) {
+      user = users[0];
+      hostUser = users[1];
+    } else {
+      user = users[1];
+      hostUser = users[0];
+    }
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -87,12 +107,6 @@ export class OrdersService {
       const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
       const filteredSeats = seats.filter((seat) => !seat.isSoldOut);
       if (filteredSeats.length) throw new ConflictException('이미 취소된 주문입니다.');
-
-      // 유저, 호스트 돈 증감
-      const [user, hostUser] = await Promise.all([
-        this.usersService.findOneWithManager({ manager, id: userId }),
-        this.usersService.findOneWithManager({ manager, id: hostId }),
-      ]);
 
       await Promise.all([
         this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true }),
@@ -111,7 +125,23 @@ export class OrdersService {
     }
   }
 
-  async findByUserId({ userId, page }): Promise<Order[]> {
+  async findByUserId({ userId, page }: IOrdersServiceFindByUserId): Promise<Order[]> {
     return await this.ordersRepository.findByUserId({ userId, page });
   }
+}
+
+interface IOrdersServiceCreate {
+  concertId: string;
+  userId: string;
+  amount: number;
+  seatIds: string[];
+}
+interface IOrdersServiceOrderCancel {
+  orderId: string;
+  userId: string;
+}
+
+interface IOrdersServiceFindByUserId {
+  userId: string;
+  page: number;
 }

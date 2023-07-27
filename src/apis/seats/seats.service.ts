@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { SeatsRepository } from './seats.repository';
 import { SeatInfoDto } from '../concert/dto/create-concert.dto';
 import { Seat } from './entities/seat.entity';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class SeatsService {
   constructor(
     private readonly seatsRepository: SeatsRepository, //
   ) {}
-  async findSeatsByConcertId({ concertId }) {
+  async findSeatsByConcertId({ concertId }: ISeatsServiceFindSeatsByConcertId): Promise<Seat[]> {
     return await this.seatsRepository.findSeatsByConcertId({ concertId });
   }
 
@@ -25,20 +26,35 @@ export class SeatsService {
         creatTemp.push(temp);
       }
     });
-    console.log(creatTemp);
+    // console.log(creatTemp);
     await this.seatsRepository.create({ creatTemp });
   }
 
-  async findSeatsWithManager({ manager, seatIds }): Promise<Seat[]> {
+  async findSeatsWithManager({ manager, seatIds }: ISeatsServicefindSeatsWithManager): Promise<Seat[]> {
     return await this.seatsRepository.findSeatsWithManager({ manager, seatIds });
   }
 
-  async seatsSoldOutWithManager({ manager, seats, isCancel }) {
+  async seatsSoldOutWithManager({ manager, seats, isCancel }: ISeatsServiceSeatsSoldOutWithManager): Promise<void> {
     await this.seatsRepository.seatsSoldOutWithManager({ manager, seats, isCancel });
   }
+}
+
+interface ISeatsServiceFindSeatsByConcertId {
+  concertId: string;
 }
 
 interface ISeatsServiceCreate {
   concertId: string;
   seatInfo: SeatInfoDto[];
+}
+
+interface ISeatsServicefindSeatsWithManager {
+  manager: EntityManager;
+  seatIds: string[];
+}
+
+interface ISeatsServiceSeatsSoldOutWithManager {
+  manager: EntityManager;
+  seats: Seat[];
+  isCancel: boolean;
 }

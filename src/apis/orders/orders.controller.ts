@@ -6,6 +6,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { HasRoles } from '../auth/guard/roles.decorator';
 import { ROLE } from '../users/entities/user.entity';
+import { Order } from './entities/order.entity';
 
 @Controller('orders')
 export class OrdersController {
@@ -19,7 +20,7 @@ export class OrdersController {
   create(
     @Req() req: IRequest,
     @Body() createOrderDto: CreateOrderDto, //
-  ): Promise<string> {
+  ) {
     const userId = req.user.id;
     const { amount, concertId, seatIds } = createOrderDto;
     return this.ordersService.create({ amount, concertId, seatIds, userId });
@@ -31,7 +32,7 @@ export class OrdersController {
   orderCancel(
     @Param('orderId') orderId: string, //
     @Req() req: IRequest,
-  ) {
+  ): Promise<string> {
     console.log(orderId);
     const userId = req.user.id;
     return this.ordersService.orderCancel({ orderId, userId });
@@ -43,7 +44,7 @@ export class OrdersController {
   findByUserId(
     @Req() req: IRequest, //
     @Query('page') page: string,
-  ) {
+  ): Promise<Order[]> {
     const userId = req.user.id;
     return this.ordersService.findByUserId({ userId, page: +page });
   }

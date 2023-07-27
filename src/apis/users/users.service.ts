@@ -3,6 +3,7 @@ import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { EntityManager } from 'typeorm';
 @Injectable()
 export class UsersService {
   constructor(
@@ -30,11 +31,11 @@ export class UsersService {
     return await this.usersRepository.findProfile({ userId });
   }
 
-  async findOneWithManager({ manager, id }): Promise<User> {
-    return await this.usersRepository.findOneWithManager({ manager, id });
+  async findUsersById({ userIds }: IUsersServiceFindUsersById): Promise<User[]> {
+    return await this.usersRepository.findUsersById({ userIds });
   }
 
-  async userPointTransaction({ manager, user, hostUser, amount, isCancel }) {
+  async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersServiceUserPointTransaction): Promise<void> {
     return await this.usersRepository.userPointTransaction({ manager, user, hostUser, amount, isCancel });
   }
 }
@@ -45,4 +46,16 @@ interface IUsersServiceCreateUser {
 
 interface IUsersServiceFindProfile {
   userId: string;
+}
+
+interface IUsersServiceFindUsersById {
+  userIds: string[];
+}
+
+interface IUsersServiceUserPointTransaction {
+  manager: EntityManager;
+  user: User;
+  hostUser: User;
+  amount: number;
+  isCancel: boolean;
 }

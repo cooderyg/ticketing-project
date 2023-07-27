@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ConcertsService } from './concerts.service';
 import { AccessAuthGuard } from '../auth/guard/auth-guard';
-import { Request } from 'express';
 import { HasRoles } from '../auth/guard/roles.decorator';
 import { ROLE } from '../users/entities/user.entity';
 import { RolesGuard } from '../auth/guard/roles.guard';
@@ -30,14 +29,14 @@ export class ConcertsController {
   @Get()
   findConcerts(
     @Query('page') page: string, //
-  ) {
+  ): Promise<Concert[]> {
     return this.concertsService.findConcerts({ page });
   }
 
   @Get('/:concertId')
   findById(
     @Param('concertId') concertId: string, //
-  ) {
+  ): Promise<Concert> {
     return this.concertsService.findById({ concertId });
   }
 
@@ -45,7 +44,7 @@ export class ConcertsController {
   searchByNameAndCategory(
     @Query('name') name: string, //
     @Query('page') page: string,
-  ) {
+  ): Promise<Concert[]> {
     return this.concertsService.searchByNameAndCategory({ name, page });
   }
 }

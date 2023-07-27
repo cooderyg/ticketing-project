@@ -38,7 +38,7 @@ export class ConcertsRepository {
 
   //-----------------------------조회-----------------------------//
 
-  async findConcerts({ page }) {
+  async findConcerts({ page }: IConcertsRepositoryFindConcerts): Promise<Concert[]> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
       .leftJoinAndSelect('concert.category', 'category')
@@ -49,7 +49,7 @@ export class ConcertsRepository {
       .getMany();
   }
 
-  async findById({ concertId }) {
+  async findById({ concertId }: IConcertsRepositoryFindById): Promise<Concert> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
       .leftJoinAndSelect('concert.seats', 'seat')
@@ -59,7 +59,7 @@ export class ConcertsRepository {
       .getOne();
   }
 
-  async findOneIsNotSoldOut({ concertId }) {
+  async findOneIsNotSoldOut({ concertId }: IConcertsRepositoryFindOneIsNotSoldOut): Promise<Concert> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
       .leftJoinAndSelect('concert.seats', 'seat')
@@ -70,7 +70,7 @@ export class ConcertsRepository {
       .getOne();
   }
 
-  async searchByNameAndCategory({ name, page }) {
+  async searchByNameAndCategory({ name, page }: IConcertsRepositorySearchByNameAndCategory): Promise<Concert[]> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
       .leftJoinAndSelect('concert.category', 'category')
@@ -93,4 +93,20 @@ interface IConcertsRepositoryCreate {
   endDate: Date;
   startDate: Date;
   concertDate: Date;
+}
+interface IConcertsRepositoryFindConcerts {
+  page: number;
+}
+
+interface IConcertsRepositoryFindById {
+  concertId: string;
+}
+
+interface IConcertsRepositoryFindOneIsNotSoldOut {
+  concertId: string;
+}
+
+interface IConcertsRepositorySearchByNameAndCategory {
+  name: string;
+  page: number;
 }

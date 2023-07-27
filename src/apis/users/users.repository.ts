@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { ROLE, User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -10,18 +10,18 @@ export class UsersRepository {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  createUser = async ({ email, password, nickname, role }: IUsersRepositoryCreateUser): Promise<User> => {
+  async createUser({ email, password, nickname, role }: IUsersRepositoryCreateUser): Promise<User> {
     return await this.usersRepository.save({
       email,
       password,
       nickname,
       role,
     });
-  };
+  }
 
-  findOneByEmail = async ({ email }: IUsersRepositoryFindOneByEmail): Promise<User> => {
+  async findOneByEmail({ email }: IUsersRepositoryFindOneByEmail): Promise<User> {
     return await this.usersRepository.findOne({ where: { email } });
-  };
+  }
 
   async findProfile({ userId }: IUserRepositoryFindProfile): Promise<User> {
     return await this.usersRepository.findOne({
@@ -29,33 +29,36 @@ export class UsersRepository {
     });
   }
 
-  async findOneWithManager({ manager, id }): Promise<User> {
-    return await manager.findOne(User, {
-      where: { id },
+  async findUsersById({ userIds }: IUsersRepositoryFindUsersById): Promise<User[]> {
+    return await this.usersRepository.find({
+      where: { id: In(userIds) },
     });
   }
 
-  async userPointTransaction({ manager, user, hostUser, amount, isCancel }) {
+  async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersRepositoryUserPointTransaction): Promise<void> {
     if (isCancel) {
       const updatedHostUser = this.usersRepository.create({
         ...hostUser,
         point: hostUser.point - amount,
       });
+
       const updatedUser = this.usersRepository.create({
         ...user,
         point: user.point + amount,
       });
+
       await manager.save(User, [updatedUser, updatedHostUser]);
     } else {
       const updatedHostUser = this.usersRepository.create({
         ...hostUser,
         point: hostUser.point + amount,
       });
+
       const updatedUser = this.usersRepository.create({
         ...user,
         point: user.point - amount,
       });
-      console.log(updatedUser);
+
       await manager.save(User, [updatedUser, updatedHostUser]);
     }
   }
@@ -74,4 +77,16 @@ interface IUsersRepositoryCreateUser {
 
 interface IUserRepositoryFindProfile {
   userId: string;
+}
+
+interface IUsersRepositoryFindUsersById {
+  userIds: string[];
+}
+
+interface IUsersRepositoryUserPointTransaction {
+  manager: EntityManager;
+  user: User;
+  hostUser: User;
+  amount: number;
+  isCancel: boolean;
 }

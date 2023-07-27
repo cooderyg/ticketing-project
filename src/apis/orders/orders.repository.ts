@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ORDERSTATUS, Order } from './entities/order.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { OrderSeat } from './entities/order-seat.entity';
-import { Seat } from '../seats/entities/seat.entity';
 
 @Injectable()
 export class OrdersRepository {
@@ -37,7 +36,7 @@ export class OrdersRepository {
     await manager.save(OrderSeat, orderSeatTemp);
   }
 
-  async findOne({ orderId }): Promise<Order> {
+  async findOne({ orderId }: IOrdersRepositoryFindOne): Promise<Order> {
     return await this.ordersRepository
       .createQueryBuilder('order')
       .leftJoinAndSelect('order.user', 'user')
@@ -49,7 +48,7 @@ export class OrdersRepository {
       .getOne();
   }
 
-  async findByUserId({ userId, page }): Promise<Order[]> {
+  async findByUserId({ userId, page }: IOrdersRepositoryFindByUserId): Promise<Order[]> {
     console.log(userId, page);
     return await this.ordersRepository
       .createQueryBuilder('order')
@@ -64,7 +63,7 @@ export class OrdersRepository {
       .getMany();
   }
 
-  async updateStatusWithManager({ manager, status, orderId }: OrdersRepositoryUpdateStatusWithManager) {
+  async updateStatusWithManager({ manager, status, orderId }: IOrdersRepositoryUpdateStatusWithManager): Promise<void> {
     await manager.update(Order, orderId, { status });
   }
 }
@@ -82,8 +81,17 @@ interface IOrdersRepositoryCreateOrderSeat {
   seatIds: string[];
 }
 
-interface OrdersRepositoryUpdateStatusWithManager {
+interface IOrdersRepositoryUpdateStatusWithManager {
   manager: EntityManager;
   status: ORDERSTATUS;
   orderId: string;
+}
+
+interface IOrdersRepositoryFindOne {
+  orderId: string;
+}
+
+interface IOrdersRepositoryFindByUserId {
+  userId: string;
+  page: number;
 }

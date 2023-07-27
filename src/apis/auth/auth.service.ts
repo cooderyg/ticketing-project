@@ -2,6 +2,8 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersRepository } from '../users/users.repository';
 import * as bcrypt from 'bcrypt';
+import { User } from '../users/entities/user.entity';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -9,7 +11,7 @@ export class AuthService {
     private readonly usersRepository: UsersRepository, //
     private readonly jwtService: JwtService,
   ) {}
-  async login({ loginDto }): Promise<string> {
+  async login({ loginDto }: IAuthServiceLogin): Promise<string> {
     const { email, password } = loginDto;
 
     const user = await this.usersRepository.findOneByEmail({ email });
@@ -22,10 +24,18 @@ export class AuthService {
     return this.getAccessToken({ user });
   }
 
-  getAccessToken({ user }): string {
+  getAccessToken({ user }: IAuthServiceGetAccessToken): string {
     return this.jwtService.sign(
       { sub: user.id, roles: [user.role] }, //
       { secret: process.env.ACCESS_SECRET_KEY, expiresIn: '12h' },
     );
   }
+}
+
+interface IAuthServiceLogin {
+  loginDto: LoginDto;
+}
+
+interface IAuthServiceGetAccessToken {
+  user: User;
 }

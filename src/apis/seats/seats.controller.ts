@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { SeatsService } from './seats.service';
+import { Seat } from './entities/seat.entity';
 
 @Controller('seats')
 export class SeatsContoller {
@@ -8,7 +9,7 @@ export class SeatsContoller {
   ) {}
 
   @Get('/:concertId')
-  getall(@Param('concertId') concertId: string) {
-    this.seatsService.findSeatsByConcertId({ concertId });
+  getall(@Param('concertId') concertId: string): Promise<Seat[]> {
+    return this.seatsService.findSeatsByConcertId({ concertId });
   }
 }

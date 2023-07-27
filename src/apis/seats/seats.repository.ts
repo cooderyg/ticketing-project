@@ -1,4 +1,4 @@
-import { In, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { Seat } from './entities/seat.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
@@ -10,7 +10,7 @@ export class SeatsRepository {
     private readonly seatsRepository: Repository<Seat>, //
   ) {}
 
-  async findSeatsByConcertId({ concertId }) {
+  async findSeatsByConcertId({ concertId }: ISeatsRepositoryFindSeatsByConcertId): Promise<Seat[]> {
     return await this.seatsRepository.find({
       where: {
         concert: {
@@ -20,7 +20,7 @@ export class SeatsRepository {
     });
   }
 
-  async create({ creatTemp }: ISeatRepositoryCreate) {
+  async create({ creatTemp }: ISeatRepositoryCreate): Promise<void> {
     await this.seatsRepository.insert(creatTemp);
   }
 
@@ -31,13 +31,17 @@ export class SeatsRepository {
     });
   }
 
-  async seatsSoldOutWithManager({ manager, seats, isCancel }) {
+  async seatsSoldOutWithManager({ manager, seats, isCancel }: ISeatsRepositorySeatsSoldOutWithManager): Promise<void> {
     if (isCancel) {
-      manager.update(Seat, seats, { isSoldOut: false });
+      await manager.update(Seat, seats, { isSoldOut: false });
     } else {
-      manager.update(Seat, seats, { isSoldOut: true });
+      await manager.update(Seat, seats, { isSoldOut: true });
     }
   }
+}
+
+interface ISeatsRepositoryFindSeatsByConcertId {
+  concertId: string;
 }
 
 interface ISeatRepositoryCreate {
@@ -48,4 +52,9 @@ interface ICreateTemp {
   grade: string;
   price: number;
   seatNum: number;
+}
+interface ISeatsRepositorySeatsSoldOutWithManager {
+  manager: EntityManager;
+  seats: Seat[];
+  isCancel: boolean;
 }

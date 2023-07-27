@@ -32,17 +32,30 @@ export class ConcertsService {
     return concert;
   }
 
-  async findConcerts({ page }) {
-    return await this.concertsRepository.findConcerts({ page });
+  async findConcerts({ page }: IConcertsServiceFindConcerts): Promise<Concert[]> {
+    return await this.concertsRepository.findConcerts({ page: +page });
   }
 
-  async findById({ concertId }) {
+  async findById({ concertId }: IConcertsServiceFindById) {
     return await this.concertsRepository.findById({ concertId });
   }
 
-  async searchByNameAndCategory({ name, page }) {
+  async searchByNameAndCategory({ name, page }: IConcertsServiceSearchByNameAndCategory): Promise<Concert[]> {
     return await this.concertsRepository.searchByNameAndCategory({ name, page: +page });
   }
+}
+
+interface IConcertsServiceFindConcerts {
+  page: string;
+}
+
+interface IConcertsServiceFindById {
+  concertId: string;
+}
+
+interface IConcertsServiceSearchByNameAndCategory {
+  name: string;
+  page: string;
 }
 
 interface IConcertsServiceCreate {
