@@ -53,12 +53,10 @@ export class OrdersService {
       // 주문좌석 생성(좌석 ID필요)
       const orderSeats = await this.ordersRepository.createOrderSeat({ manager, orderId: order.id, seatIds });
       console.log(orderSeats);
-      // 유저 돈 차감 호스트 돈 증가
 
-      await Promise.all([
-        this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false }),
-        this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: false }),
-      ]);
+      // 유저 돈 차감 호스트 돈 증가
+      await this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false });
+      await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: false });
 
       await queryRunner.commitTransaction();
       return '결제가 성공적으로 완료되었습니다.';
@@ -108,11 +106,9 @@ export class OrdersService {
       const filteredSeats = seats.filter((seat) => !seat.isSoldOut);
       if (filteredSeats.length) throw new ConflictException('이미 취소된 주문입니다.');
 
-      await Promise.all([
-        this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true }),
-        this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: true }),
-        this.ordersRepository.updateStatusWithManager({ manager, orderId, status: ORDERSTATUS.CANCEL }),
-      ]);
+      await this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true });
+      await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: true });
+      await this.ordersRepository.updateStatusWithManager({ manager, orderId, status: ORDERSTATUS.CANCEL });
 
       await queryRunner.commitTransaction();
       return '결제취소가 성공적으로 완료되었습니다.';
