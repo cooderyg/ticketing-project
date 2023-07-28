@@ -1,6 +1,5 @@
 import { User } from 'src/apis/users/entities/user.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { OrderSeat } from './order-seat.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Concert } from 'src/apis/concert/entities/concert.entity';
 
 export enum ORDERSTATUS {
@@ -19,6 +18,9 @@ export class Order {
   @Column()
   amount: number;
 
+  @Column({ type: 'simple-json' })
+  seatInfos: { seatId: string; grade: string; seatNum: number }[];
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -31,13 +33,6 @@ export class Order {
     { onDelete: 'CASCADE' },
   )
   user: User;
-
-  @OneToMany(
-    () => OrderSeat, //
-    (orderSeat) => orderSeat.order,
-    { cascade: true },
-  )
-  orderSeats: OrderSeat[];
 
   @ManyToOne(
     () => Concert, //
