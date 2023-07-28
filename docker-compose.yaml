@@ -1,0 +1,32 @@
+version: '3.7'
+
+# 가상컴퓨터들
+
+services:
+  # 가상컴퓨터 이름
+  mybackend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/myfolder/src
+    ports:
+      - 3000:3000
+    env_file:
+      - './.env.docker'
+
+  # 가상컴퓨터 이름
+  my-database:
+    # DB실행오류발생시 cpu문제해결 platform: linux/86_64
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: 'mydocker'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - 3306:3306
+
+  # 가상컴퓨터 이름
+  my-redis:
+    image: redis:latest
+    ports:
+      - 6379:6379

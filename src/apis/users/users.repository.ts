@@ -29,9 +29,10 @@ export class UsersRepository {
     });
   }
 
-  async findUsersById({ userIds }: IUsersRepositoryFindUsersById): Promise<User[]> {
-    return await this.usersRepository.find({
+  async findUsersWithManager({ manager, userIds }: IUsersRepositoryFindUsersById): Promise<User[]> {
+    return await manager.find(User, {
       where: { id: In(userIds) },
+      lock: { mode: 'pessimistic_write' },
     });
   }
 
@@ -80,6 +81,7 @@ interface IUserRepositoryFindProfile {
 }
 
 interface IUsersRepositoryFindUsersById {
+  manager: EntityManager;
   userIds: string[];
 }
 
