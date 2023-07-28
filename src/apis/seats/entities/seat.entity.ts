@@ -1,6 +1,6 @@
 import { Concert } from 'src/apis/concert/entities/concert.entity';
-import { OrderSeat } from 'src/apis/orders/entities/order-seat.entity';
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class Seat {
@@ -31,10 +31,4 @@ export class Seat {
     { onDelete: 'CASCADE' },
   )
   concert: Concert;
-
-  @OneToMany(
-    () => OrderSeat, //
-    (orderSeat) => orderSeat.order,
-  )
-  orderSeats: OrderSeat[];
 }

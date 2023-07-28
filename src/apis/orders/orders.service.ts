@@ -17,7 +17,7 @@ export class OrdersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate) {
+  async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
     const concert = await this.concertsService.findById({ concertId });
 
     if (!concert) throw new HttpException('해당 콘서트를 찾을 수 없습니다.', 404);
@@ -48,18 +48,22 @@ export class OrdersService {
       console.log(filteredSeats);
       if (filteredSeats.length) throw new ConflictException('이미 판매된 좌석입니다.');
 
-      const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId });
+      const seatInfos = seats.map((seat) => {
+        return {
+          seatId: seat.id,
+          grade: seat.grade,
+          seatNum: seat.seatNum,
+        };
+      });
 
-      // 주문좌석 생성(좌석 ID필요)
-      const orderSeats = await this.ordersRepository.createOrderSeat({ manager, orderId: order.id, seatIds });
-      console.log(orderSeats);
+      const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId, seatInfos });
 
       // 유저 돈 차감 호스트 돈 증가
       await this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false });
       await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: false });
 
       await queryRunner.commitTransaction();
-      return '결제가 성공적으로 완료되었습니다.';
+      return order;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.log(error.message);
@@ -69,19 +73,19 @@ export class OrdersService {
     }
   }
 
-  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<string> {
+  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<Order> {
     const order = await this.ordersRepository.findOne({ orderId });
     if (order.user.id !== userId) throw new HttpException('주문취소 권한이 없습니다', 401);
     if (order.status === ORDERSTATUS.CANCEL) throw new ConflictException('이미 취소된 결제입니다.');
 
-    const orderSeats = order.orderSeats;
+    const orderSeatInfos = order.seatInfos;
 
     const nowTime = new Date().getTime();
     const ticketingEndTime = new Date(order.concert.endDate).getTime() - 60 * 60 * 3;
 
     if (nowTime > ticketingEndTime) throw new ConflictException('취소가능 시간을 초과하였습니다.');
 
-    const seatIds = orderSeats.map((orderSeat) => orderSeat.seat.id);
+    const seatIds = orderSeatInfos.map((orderSeat) => orderSeat.seatId);
     const hostId = order.concert.user.id;
 
     const users = await this.usersService.findUsersById({ userIds: [userId, hostId] });
@@ -108,10 +112,10 @@ export class OrdersService {
 
       await this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true });
       await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: true });
-      await this.ordersRepository.updateStatusWithManager({ manager, orderId, status: ORDERSTATUS.CANCEL });
+      const result = await this.ordersRepository.updateStatusWithManager({ manager, orderId, status: ORDERSTATUS.CANCEL });
 
       await queryRunner.commitTransaction();
-      return '결제취소가 성공적으로 완료되었습니다.';
+      return result;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       console.log(error.message);

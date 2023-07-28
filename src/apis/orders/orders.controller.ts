@@ -20,7 +20,7 @@ export class OrdersController {
   create(
     @Req() req: IRequest,
     @Body() createOrderDto: CreateOrderDto, //
-  ) {
+  ): Promise<Order> {
     const userId = req.user.id;
     const { amount, concertId, seatIds } = createOrderDto;
     return this.ordersService.create({ amount, concertId, seatIds, userId });
@@ -32,7 +32,7 @@ export class OrdersController {
   orderCancel(
     @Param('orderId') orderId: string, //
     @Req() req: IRequest,
-  ): Promise<string> {
+  ): Promise<Order> {
     console.log(orderId);
     const userId = req.user.id;
     return this.ordersService.orderCancel({ orderId, userId });
