@@ -32,7 +32,7 @@ export class UsersRepository {
   async findUsersWithManager({ manager, userIds }: IUsersRepositoryFindUsersById): Promise<User[]> {
     return await manager.find(User, {
       where: { id: In(userIds) },
-      lock: { mode: 'pessimistic_write' },
+      // lock: { mode: 'pessimistic_write' },
     });
   }
 

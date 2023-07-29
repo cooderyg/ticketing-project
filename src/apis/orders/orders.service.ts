@@ -6,6 +6,9 @@ import { ConcertsService } from '../concert/concerts.service';
 import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class OrdersService {
@@ -15,7 +18,18 @@ export class OrdersService {
     private readonly concertsService: ConcertsService,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
+    @InjectQueue('orderQueue')
+    private readonly orderQueue: Queue,
   ) {}
+
+  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate) {
+    // console.log(this.orderQueue);
+    const order = await this.orderQueue.add(
+      'addOrderQueue', //
+      { concertId, userId, amount, seatIds },
+      { removeOnComplete: true, removeOnFail: true, jobId: v4() },
+    );
+  }
 
   async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
     const concert = await this.concertsService.findById({ concertId });
@@ -127,7 +141,7 @@ export class OrdersService {
   }
 }
 
-interface IOrdersServiceCreate {
+export interface IOrdersServiceCreate {
   concertId: string;
   userId: string;
   amount: number;
