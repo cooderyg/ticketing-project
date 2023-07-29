@@ -31,8 +31,8 @@ export class UsersService {
     return await this.usersRepository.findProfile({ userId });
   }
 
-  async findUsersById({ userIds }: IUsersServiceFindUsersById): Promise<User[]> {
-    return await this.usersRepository.findUsersById({ userIds });
+  async findUsersWithManager({ manager, userIds }: IUsersServiceFindUsersById): Promise<User[]> {
+    return await this.usersRepository.findUsersWithManager({ manager, userIds });
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersServiceUserPointTransaction): Promise<void> {
@@ -49,6 +49,7 @@ interface IUsersServiceFindProfile {
 }
 
 interface IUsersServiceFindUsersById {
+  manager: EntityManager;
   userIds: string[];
 }
 

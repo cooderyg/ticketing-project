@@ -26,7 +26,7 @@ export class SeatsRepository {
 
   async findSeatsWithManager({ manager, seatIds }): Promise<Seat[]> {
     return await manager.find(Seat, {
-      lock: { mode: 'pessimistic_write' },
+      // lock: { mode: 'pessimistic_write' },
       where: { id: In(seatIds) },
     });
   }

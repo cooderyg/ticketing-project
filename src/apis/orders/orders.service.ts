@@ -6,6 +6,9 @@ import { ConcertsService } from '../concert/concerts.service';
 import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { v4 } from 'uuid';
 
 @Injectable()
 export class OrdersService {
@@ -15,7 +18,18 @@ export class OrdersService {
     private readonly concertsService: ConcertsService,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
+    @InjectQueue('orderQueue')
+    private readonly orderQueue: Queue,
   ) {}
+
+  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate) {
+    // console.log(this.orderQueue);
+    const order = await this.orderQueue.add(
+      'addOrderQueue', //
+      { concertId, userId, amount, seatIds },
+      { removeOnComplete: true, removeOnFail: true, jobId: v4() },
+    );
+  }
 
   async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
     const concert = await this.concertsService.findById({ concertId });
@@ -23,29 +37,30 @@ export class OrdersService {
     if (!concert) throw new HttpException('해당 콘서트를 찾을 수 없습니다.', 404);
     const hostId = concert.user.id;
 
-    // in문을 사용하면 순서대로 반환하나? 순서대로 반환하지 않음,,, 조건문필요
-    const users = await this.usersService.findUsersById({ userIds: [userId, hostId] });
-    let user: User;
-    let hostUser: User;
-    if (users[0].role === ROLE.USER) {
-      user = users[0];
-      hostUser = users[1];
-    } else {
-      user = users[1];
-      hostUser = users[0];
-    }
-    if (user.point < amount) throw new HttpException('포인트 잔액이 부족합니다.', 400);
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       // 트랜젝션
       const manager = queryRunner.manager;
+      // in문을 사용하면 순서대로 반환하나? 순서대로 반환하지 않음,,, 조건문필요
+      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId] });
+      let user: User;
+      let hostUser: User;
+      if (users[0].role === ROLE.USER) {
+        user = users[0];
+        hostUser = users[1];
+      } else {
+        user = users[1];
+        hostUser = users[0];
+      }
+      if (user.point < amount) throw new HttpException('포인트 잔액이 부족합니다.', 400);
+      await this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false });
+
       const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
 
       const filteredSeats = seats.filter((seat) => seat.isSoldOut);
-      console.log(filteredSeats);
+
       if (filteredSeats.length) throw new ConflictException('이미 판매된 좌석입니다.');
 
       const seatInfos = seats.map((seat) => {
@@ -56,12 +71,9 @@ export class OrdersService {
         };
       });
 
-      const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId, seatInfos });
-
-      // 유저 돈 차감 호스트 돈 증가
-      await this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false });
       await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: false });
 
+      const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId, seatInfos });
       await queryRunner.commitTransaction();
       return order;
     } catch (error) {
@@ -88,30 +100,29 @@ export class OrdersService {
     const seatIds = orderSeatInfos.map((orderSeat) => orderSeat.seatId);
     const hostId = order.concert.user.id;
 
-    const users = await this.usersService.findUsersById({ userIds: [userId, hostId] });
-    let user: User;
-    let hostUser: User;
-    if (users[0].role === ROLE.USER) {
-      user = users[0];
-      hostUser = users[1];
-    } else {
-      user = users[1];
-      hostUser = users[0];
-    }
-
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       const manager = queryRunner.manager;
-
+      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId] });
+      let user: User;
+      let hostUser: User;
+      if (users[0].role === ROLE.USER) {
+        user = users[0];
+        hostUser = users[1];
+      } else {
+        user = users[1];
+        hostUser = users[0];
+      }
+      await this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true });
       // 좌석상태
       const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
       const filteredSeats = seats.filter((seat) => !seat.isSoldOut);
       if (filteredSeats.length) throw new ConflictException('이미 취소된 주문입니다.');
 
-      await this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true });
       await this.seatsService.seatsSoldOutWithManager({ manager, seats, isCancel: true });
+
       const result = await this.ordersRepository.updateStatusWithManager({ manager, orderId, status: ORDERSTATUS.CANCEL });
 
       await queryRunner.commitTransaction();
@@ -130,7 +141,7 @@ export class OrdersService {
   }
 }
 
-interface IOrdersServiceCreate {
+export interface IOrdersServiceCreate {
   concertId: string;
   userId: string;
   amount: number;

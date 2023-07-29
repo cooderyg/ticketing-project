@@ -28,6 +28,18 @@ export class OrdersController {
 
   @HasRoles(ROLE.USER)
   @UseGuards(AccessAuthGuard, RolesGuard)
+  @Post('/queue')
+  createQueue(
+    @Req() req: IRequest,
+    @Body() createOrderDto: CreateOrderDto, //
+  ) {
+    const userId = req.user.id;
+    const { amount, concertId, seatIds } = createOrderDto;
+    return this.ordersService.addorderQueue({ amount, concertId, seatIds, userId });
+  }
+
+  @HasRoles(ROLE.USER)
+  @UseGuards(AccessAuthGuard, RolesGuard)
   @Post('/cancel/:orderId')
   orderCancel(
     @Param('orderId') orderId: string, //

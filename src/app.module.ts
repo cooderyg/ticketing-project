@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './apis/auth/auth.module';
 import { UsersModule } from './apis/users/users.module';
 import { OrdersModule } from './apis/orders/orders.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -29,6 +30,12 @@ import { OrdersModule } from './apis/orders/orders.module';
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: true,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'my-redis',
+        port: 6379,
+      },
     }),
   ],
   controllers: [
