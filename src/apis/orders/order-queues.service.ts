@@ -10,7 +10,7 @@ import { Queue } from 'bull';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectQueue } from '@nestjs/bull';
 import { v4 } from 'uuid';
-import { IOrdersServiceCreateQueue, IwaitFinishReturn } from './interfaces/order-queues-service.interface';
+import { IOrderQueuesServiceListener, IOrdersServiceCreateQueue, IwaitResultReturn } from './interfaces/order-queues-service.interface';
 import { IOrdersServiceCreate } from './interfaces/orders-service.interface';
 
 @Injectable()
@@ -31,12 +31,11 @@ export class OrderQueuesService {
     await this.orderQueue.add(
       'addOrderQueue', //
       { concertId, userId, amount, seatIds, uuid },
-      { jobId: uuid }, //removeOnComplete: true, removeOnFail: true,
+      { removeOnComplete: true, removeOnFail: true, jobId: uuid },
     );
-    const result = await this.waitFinish({ uuid });
+    const result = await this.waitResult({ uuid });
     console.log(result);
     if (result?.error) throw result.error;
-    if (result.message === '대기시간을 초과했습니다. 다시 시도해주세요.') throw new HttpException('대기시간을 초과했습니다. 다시 시도해주세요.', 500);
     return result.order;
   }
 
@@ -94,17 +93,12 @@ export class OrderQueuesService {
     }
   }
 
-  private waitFinish({ uuid }): Promise<IwaitFinishReturn> {
+  waitResult({ uuid }): Promise<IwaitResultReturn> {
     return new Promise((resolve, reject) => {
-      const wait = setTimeout(() => {
-        this.eventEmitter.removeAllListeners(uuid);
-        resolve({ message: '대기시간을 초과했습니다. 다시 시도해주세요.' });
-      }, 1000); // 대기열 시간을 길게 가져가려면 해당 부분을 길게 가져가면 됨
-      const listenFn = ({ success, error, order }: { success: boolean; error?: HttpException; order: Order }) => {
-        clearTimeout(wait);
+      const listener = ({ success, error, order }: IOrderQueuesServiceListener) => {
         success ? resolve({ message: '주문성공', order }) : reject(error);
       };
-      this.eventEmitter.addListener(uuid, listenFn);
+      this.eventEmitter.once(uuid, listener);
     });
   }
 }

@@ -5,7 +5,7 @@ export interface IOrdersServiceCreateQueue extends IOrdersServiceCreate {
   uuid: string;
 }
 
-export interface IwaitFinishReturn {
+export interface IwaitResultReturn {
   message?: string;
   error?: HttpException;
   order?: Order;
@@ -16,4 +16,10 @@ export interface IOrdersServiceCreate {
   userId: string;
   amount: number;
   seatIds: string[];
+}
+
+export interface IOrderQueuesServiceListener {
+  success: boolean;
+  error?: HttpException;
+  order?: Order;
 }
