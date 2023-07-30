@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ORDERSTATUS, Order } from './entities/order.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Order } from './entities/order.entity';
+import { Repository } from 'typeorm';
+import {
+  IOrdersRepositoryCreateOrder,
+  IOrdersRepositoryFindByUserId,
+  IOrdersRepositoryFindOne,
+  IOrdersRepositoryUpdateStatusWithManager,
+} from './interfaces/orders-reopsitory.interface';
 
 @Injectable()
 export class OrdersRepository {
@@ -48,33 +54,4 @@ export class OrdersRepository {
   async updateStatusWithManager({ manager, status, orderId }: IOrdersRepositoryUpdateStatusWithManager): Promise<Order> {
     return await manager.save(Order, { id: orderId, status });
   }
-}
-
-interface IOrdersRepositoryCreateOrder {
-  manager: EntityManager;
-  amount: number;
-  userId: string;
-  concertId: string;
-  seatInfos: ISeatInfo[];
-}
-
-interface ISeatInfo {
-  seatId: string;
-  grade: string;
-  seatNum: number;
-}
-
-interface IOrdersRepositoryUpdateStatusWithManager {
-  manager: EntityManager;
-  status: ORDERSTATUS;
-  orderId: string;
-}
-
-interface IOrdersRepositoryFindOne {
-  orderId: string;
-}
-
-interface IOrdersRepositoryFindByUserId {
-  userId: string;
-  page: number;
 }

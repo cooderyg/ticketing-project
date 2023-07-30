@@ -30,8 +30,8 @@ export class SeatsService {
     await this.seatsRepository.create({ creatTemp });
   }
 
-  async findSeatsWithManager({ manager, seatIds }: ISeatsServicefindSeatsWithManager): Promise<Seat[]> {
-    return await this.seatsRepository.findSeatsWithManager({ manager, seatIds });
+  async findSeatsWithManager({ manager, seatIds, isQueue }: ISeatsServicefindSeatsWithManager): Promise<Seat[]> {
+    return await this.seatsRepository.findSeatsWithManager({ manager, seatIds, isQueue });
   }
 
   async seatsSoldOutWithManager({ manager, seats, isCancel }: ISeatsServiceSeatsSoldOutWithManager): Promise<void> {
@@ -51,6 +51,7 @@ interface ISeatsServiceCreate {
 interface ISeatsServicefindSeatsWithManager {
   manager: EntityManager;
   seatIds: string[];
+  isQueue: boolean;
 }
 
 interface ISeatsServiceSeatsSoldOutWithManager {

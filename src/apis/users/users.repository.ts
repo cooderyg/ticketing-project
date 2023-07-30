@@ -29,11 +29,17 @@ export class UsersRepository {
     });
   }
 
-  async findUsersWithManager({ manager, userIds }: IUsersRepositoryFindUsersById): Promise<User[]> {
-    return await manager.find(User, {
-      where: { id: In(userIds) },
-      // lock: { mode: 'pessimistic_write' },
-    });
+  async findUsersWithManager({ manager, userIds, isQueue }: IUsersRepositoryFindUsersById): Promise<User[]> {
+    if (isQueue) {
+      return await manager.find(User, {
+        where: { id: In(userIds) },
+      });
+    } else {
+      return await manager.find(User, {
+        where: { id: In(userIds) },
+        lock: { mode: 'pessimistic_write' },
+      });
+    }
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersRepositoryUserPointTransaction): Promise<void> {
@@ -83,6 +89,7 @@ interface IUserRepositoryFindProfile {
 interface IUsersRepositoryFindUsersById {
   manager: EntityManager;
   userIds: string[];
+  isQueue: boolean;
 }
 
 interface IUsersRepositoryUserPointTransaction {
