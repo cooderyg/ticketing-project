@@ -2,6 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Concert } from './entities/concert.entity';
 import { Repository } from 'typeorm';
+import {
+  IConcertsRepositoryCreate,
+  IConcertsRepositoryFindById,
+  IConcertsRepositoryFindConcerts,
+  IConcertsRepositoryFindOneIsNotSoldOut,
+  IConcertsRepositorySearchByNameAndCategory,
+} from './interfaces/concerts-repository.interface';
 
 @Injectable()
 export class ConcertsRepository {
@@ -81,32 +88,4 @@ export class ConcertsRepository {
       .skip((page - 1) * 12)
       .getMany();
   }
-}
-
-interface IConcertsRepositoryCreate {
-  userId: string;
-  name: string;
-  categoryId: string;
-  address: string;
-  description: string;
-  imageUrl: string;
-  endDate: Date;
-  startDate: Date;
-  concertDate: Date;
-}
-interface IConcertsRepositoryFindConcerts {
-  page: number;
-}
-
-interface IConcertsRepositoryFindById {
-  concertId: string;
-}
-
-interface IConcertsRepositoryFindOneIsNotSoldOut {
-  concertId: string;
-}
-
-interface IConcertsRepositorySearchByNameAndCategory {
-  name: string;
-  page: number;
 }

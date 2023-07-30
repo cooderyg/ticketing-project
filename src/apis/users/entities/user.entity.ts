@@ -1,4 +1,4 @@
-import { Concert } from 'src/apis/concert/entities/concert.entity';
+import { Concert } from 'src/apis/concerts/entities/concert.entity';
 import { Order } from 'src/apis/orders/entities/order.entity';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 

@@ -1,4 +1,4 @@
-import { Concert } from 'src/apis/concert/entities/concert.entity';
+import { Concert } from 'src/apis/concerts/entities/concert.entity';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()

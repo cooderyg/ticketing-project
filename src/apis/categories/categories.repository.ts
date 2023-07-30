@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
-import { CreateCategoryDto } from './dto/create-category.dto';
+import { ICategoriesRepositoryCreate } from './interfaces/categories-repository.interface';
 
 @Injectable()
 export class CategoriesRepository {
@@ -15,8 +15,4 @@ export class CategoriesRepository {
       ...createCategoryDto,
     });
   }
-}
-
-interface ICategoriesRepositoryCreate {
-  createCategoryDto: CreateCategoryDto;
 }

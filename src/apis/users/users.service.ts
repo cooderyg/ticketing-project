@@ -1,9 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { EntityManager } from 'typeorm';
+import {
+  IUsersServiceCreateUser,
+  IUsersServiceFindProfile,
+  IUsersServiceFindUsersById,
+  IUsersServiceUserPointTransaction,
+} from './interfaces/users-service.interface';
 @Injectable()
 export class UsersService {
   constructor(
@@ -38,26 +42,4 @@ export class UsersService {
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersServiceUserPointTransaction): Promise<void> {
     return await this.usersRepository.userPointTransaction({ manager, user, hostUser, amount, isCancel });
   }
-}
-
-interface IUsersServiceCreateUser {
-  createUserDto: CreateUserDto;
-}
-
-interface IUsersServiceFindProfile {
-  userId: string;
-}
-
-interface IUsersServiceFindUsersById {
-  manager: EntityManager;
-  userIds: string[];
-  isQueue: boolean;
-}
-
-interface IUsersServiceUserPointTransaction {
-  manager: EntityManager;
-  user: User;
-  hostUser: User;
-  amount: number;
-  isCancel: boolean;
 }

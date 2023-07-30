@@ -4,7 +4,7 @@ import { Order } from './entities/order.entity';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { OrdersRepository } from './orders.repository';
-import { ConcertsModule } from '../concert/concerts.module';
+import { ConcertsModule } from '../concerts/concerts.module';
 import { UsersModule } from '../users/users.module';
 import { SeatsModule } from '../seats/seats.module';
 import { BullModule } from '@nestjs/bull';

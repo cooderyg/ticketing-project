@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SeatsRepository } from './seats.repository';
-import { SeatInfoDto } from '../concert/dto/create-concert.dto';
 import { Seat } from './entities/seat.entity';
-import { EntityManager } from 'typeorm';
+
+import {
+  ISeatsServiceCreate,
+  ISeatsServiceFindSeatsByConcertId,
+  ISeatsServiceSeatsSoldOutWithManager,
+  ISeatsServicefindSeatsWithManager,
+} from './interfaces/seats.service.interface';
 
 @Injectable()
 export class SeatsService {
@@ -26,7 +31,6 @@ export class SeatsService {
         creatTemp.push(temp);
       }
     });
-    // console.log(creatTemp);
     await this.seatsRepository.create({ creatTemp });
   }
 
@@ -37,25 +41,4 @@ export class SeatsService {
   async seatsSoldOutWithManager({ manager, seats, isCancel }: ISeatsServiceSeatsSoldOutWithManager): Promise<void> {
     await this.seatsRepository.seatsSoldOutWithManager({ manager, seats, isCancel });
   }
-}
-
-interface ISeatsServiceFindSeatsByConcertId {
-  concertId: string;
-}
-
-interface ISeatsServiceCreate {
-  concertId: string;
-  seatInfo: SeatInfoDto[];
-}
-
-interface ISeatsServicefindSeatsWithManager {
-  manager: EntityManager;
-  seatIds: string[];
-  isQueue: boolean;
-}
-
-interface ISeatsServiceSeatsSoldOutWithManager {
-  manager: EntityManager;
-  seats: Seat[];
-  isCancel: boolean;
 }

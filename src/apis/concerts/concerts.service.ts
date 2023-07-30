@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConcertsRepository } from './concerts.repository';
-import { CreateConcertDto } from './dto/create-concert.dto';
 import { Concert } from './entities/concert.entity';
 import { SeatsService } from '../seats/seats.service';
+import {
+  IConcertsServiceCreate,
+  IConcertsServiceFindById,
+  IConcertsServiceFindConcerts,
+  IConcertsServiceSearchByNameAndCategory,
+} from './interfaces/concerts-service.interface';
 
 @Injectable()
 export class ConcertsService {
@@ -43,22 +48,4 @@ export class ConcertsService {
   async searchByNameAndCategory({ name, page }: IConcertsServiceSearchByNameAndCategory): Promise<Concert[]> {
     return await this.concertsRepository.searchByNameAndCategory({ name, page: +page });
   }
-}
-
-interface IConcertsServiceFindConcerts {
-  page: string;
-}
-
-interface IConcertsServiceFindById {
-  concertId: string;
-}
-
-interface IConcertsServiceSearchByNameAndCategory {
-  name: string;
-  page: string;
-}
-
-interface IConcertsServiceCreate {
-  userId: string;
-  createConcertDto: CreateConcertDto;
 }

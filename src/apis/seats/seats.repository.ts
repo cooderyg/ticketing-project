@@ -1,7 +1,13 @@
-import { EntityManager, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Seat } from './entities/seat.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
+import {
+  ISeatRepositoryCreate,
+  ISeatsRepositoryFindSeatsByConcertId,
+  ISeatsRepositoryFindSeatsWithManager,
+  ISeatsRepositorySeatsSoldOutWithManager,
+} from './interfaces/seats.repository.interface';
 
 @Injectable()
 export class SeatsRepository {
@@ -44,29 +50,4 @@ export class SeatsRepository {
       await manager.update(Seat, seats, { isSoldOut: true });
     }
   }
-}
-
-interface ISeatsRepositoryFindSeatsWithManager {
-  isQueue: boolean;
-  manager: EntityManager;
-  seatIds: string[];
-}
-
-interface ISeatsRepositoryFindSeatsByConcertId {
-  concertId: string;
-}
-
-interface ISeatRepositoryCreate {
-  creatTemp: ICreateTemp[];
-}
-
-interface ICreateTemp {
-  grade: string;
-  price: number;
-  seatNum: number;
-}
-interface ISeatsRepositorySeatsSoldOutWithManager {
-  manager: EntityManager;
-  seats: Seat[];
-  isCancel: boolean;
 }

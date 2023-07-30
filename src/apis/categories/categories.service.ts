@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CategoriesRepository } from './categories.repository';
-import { CreateCategoryDto } from './dto/create-category.dto';
 import { Category } from './entities/category.entity';
+import { ICategoriesServiceCreate } from './interfaces/categories-service.interface';
 
 @Injectable()
 export class CategoriesService {
@@ -12,8 +12,4 @@ export class CategoriesService {
   async create({ createCategoryDto }: ICategoriesServiceCreate): Promise<Category> {
     return await this.categoriesRepository.create({ createCategoryDto });
   }
-}
-
-interface ICategoriesServiceCreate {
-  createCategoryDto: CreateCategoryDto;
 }

@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeatsModule } from './apis/seats/seats.module';
 import { CategoriesModule } from './apis/categories/categories.module';
-import { ConcertsModule } from './apis/concert/concerts.module';
+import { ConcertsModule } from './apis/concerts/concerts.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './apis/auth/auth.module';
 import { UsersModule } from './apis/users/users.module';

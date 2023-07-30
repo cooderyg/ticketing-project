@@ -1,6 +1,6 @@
 import { User } from 'src/apis/users/entities/user.entity';
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Concert } from 'src/apis/concert/entities/concert.entity';
+import { Concert } from 'src/apis/concerts/entities/concert.entity';
 
 export enum ORDERSTATUS {
   PAYMENT = 'PAYMENT',

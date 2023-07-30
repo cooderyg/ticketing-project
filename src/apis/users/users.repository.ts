@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
-import { ROLE, User } from './entities/user.entity';
+import { In, Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import {
+  IUserRepositoryFindProfile,
+  IUsersRepositoryCreateUser,
+  IUsersRepositoryFindOneByEmail,
+  IUsersRepositoryFindUsersById,
+  IUsersRepositoryUserPointTransaction,
+} from './interfaces/users-repository.interface';
 
 @Injectable()
 export class UsersRepository {
@@ -69,33 +76,4 @@ export class UsersRepository {
       await manager.save(User, [updatedUser, updatedHostUser]);
     }
   }
-}
-
-interface IUsersRepositoryFindOneByEmail {
-  email: string;
-}
-
-interface IUsersRepositoryCreateUser {
-  email: string;
-  password: string;
-  nickname: string;
-  role: ROLE;
-}
-
-interface IUserRepositoryFindProfile {
-  userId: string;
-}
-
-interface IUsersRepositoryFindUsersById {
-  manager: EntityManager;
-  userIds: string[];
-  isQueue: boolean;
-}
-
-interface IUsersRepositoryUserPointTransaction {
-  manager: EntityManager;
-  user: User;
-  hostUser: User;
-  amount: number;
-  isCancel: boolean;
 }

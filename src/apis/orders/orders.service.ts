@@ -2,7 +2,7 @@ import { ConflictException, HttpException, Injectable } from '@nestjs/common';
 import { OrdersRepository } from './orders.repository';
 import { ORDERSTATUS, Order } from './entities/order.entity';
 import { DataSource } from 'typeorm';
-import { ConcertsService } from '../concert/concerts.service';
+import { ConcertsService } from '../concerts/concerts.service';
 import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';

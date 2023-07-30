@@ -3,7 +3,7 @@ import { Order } from './entities/order.entity';
 import { ROLE, User } from '../users/entities/user.entity';
 import { SeatsService } from '../seats/seats.service';
 import { OrdersRepository } from './orders.repository';
-import { ConcertsService } from '../concert/concerts.service';
+import { ConcertsService } from '../concerts/concerts.service';
 import { UsersService } from '../users/users.service';
 import { DataSource } from 'typeorm';
 import { Queue } from 'bull';
