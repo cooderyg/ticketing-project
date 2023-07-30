@@ -8,6 +8,7 @@ import { HasRoles } from '../auth/guard/roles.decorator';
 import { ROLE } from '../users/entities/user.entity';
 import { Order } from './entities/order.entity';
 import { OrderQueuesService } from './order-queues.service';
+import { BullBoardInstance, InjectBullBoard } from '@bull-board/nestjs';
 
 @Controller('orders')
 export class OrdersController {

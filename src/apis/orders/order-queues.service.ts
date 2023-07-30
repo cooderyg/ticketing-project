@@ -31,7 +31,7 @@ export class OrderQueuesService {
     await this.orderQueue.add(
       'addOrderQueue', //
       { concertId, userId, amount, seatIds, uuid },
-      { removeOnComplete: true, removeOnFail: true, jobId: uuid },
+      { jobId: uuid }, //removeOnComplete: true, removeOnFail: true,
     );
     const result = await this.waitFinish({ uuid });
     console.log(result);
