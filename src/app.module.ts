@@ -10,6 +10,7 @@ import { AuthModule } from './apis/auth/auth.module';
 import { UsersModule } from './apis/users/users.module';
 import { OrdersModule } from './apis/orders/orders.module';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { BullModule } from '@nestjs/bull';
         port: 6379,
       },
     }),
+    EventEmitterModule.forRoot(),
   ],
   controllers: [
     AppController, //

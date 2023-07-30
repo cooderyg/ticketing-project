@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { AccessAuthGuard } from '../auth/guard/auth-guard';
 import { IRequest } from 'src/commons/interfaces/context';
@@ -7,11 +7,13 @@ import { RolesGuard } from '../auth/guard/roles.guard';
 import { HasRoles } from '../auth/guard/roles.decorator';
 import { ROLE } from '../users/entities/user.entity';
 import { Order } from './entities/order.entity';
+import { OrderQueuesService } from './order-queues.service';
 
 @Controller('orders')
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService, //
+    private readonly orderQueuesService: OrderQueuesService,
   ) {}
 
   @HasRoles(ROLE.USER)
@@ -29,13 +31,13 @@ export class OrdersController {
   @HasRoles(ROLE.USER)
   @UseGuards(AccessAuthGuard, RolesGuard)
   @Post('/queue')
-  createQueue(
+  async createQueue(
     @Req() req: IRequest,
     @Body() createOrderDto: CreateOrderDto, //
   ) {
     const userId = req.user.id;
     const { amount, concertId, seatIds } = createOrderDto;
-    return this.ordersService.addorderQueue({ amount, concertId, seatIds, userId });
+    return await this.orderQueuesService.addorderQueue({ amount, concertId, seatIds, userId });
   }
 
   @HasRoles(ROLE.USER)

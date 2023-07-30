@@ -9,6 +9,7 @@ import { UsersModule } from '../users/users.module';
 import { SeatsModule } from '../seats/seats.module';
 import { BullModule } from '@nestjs/bull';
 import { OrderProcessor } from './orders.processor';
+import { OrderQueuesService } from './order-queues.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { OrderProcessor } from './orders.processor';
     }),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, OrdersRepository, OrderProcessor],
+  providers: [OrdersService, OrderQueuesService, OrdersRepository, OrderProcessor],
 })
 export class OrdersModule {}

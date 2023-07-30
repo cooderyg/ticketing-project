@@ -6,9 +6,7 @@ import { ConcertsService } from '../concert/concerts.service';
 import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
-import { v4 } from 'uuid';
+import { IOrdersServiceCreate, IOrdersServiceFindByUserId, IOrdersServiceOrderCancel } from './interfaces/orders-service.interface';
 
 @Injectable()
 export class OrdersService {
@@ -18,18 +16,7 @@ export class OrdersService {
     private readonly concertsService: ConcertsService,
     private readonly usersService: UsersService,
     private readonly dataSource: DataSource,
-    @InjectQueue('orderQueue')
-    private readonly orderQueue: Queue,
   ) {}
-
-  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate) {
-    // console.log(this.orderQueue);
-    const order = await this.orderQueue.add(
-      'addOrderQueue', //
-      { concertId, userId, amount, seatIds },
-      { removeOnComplete: true, removeOnFail: true, jobId: v4() },
-    );
-  }
 
   async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
     const concert = await this.concertsService.findById({ concertId });
@@ -44,7 +31,7 @@ export class OrdersService {
       // 트랜젝션
       const manager = queryRunner.manager;
       // in문을 사용하면 순서대로 반환하나? 순서대로 반환하지 않음,,, 조건문필요
-      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId] });
+      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId], isQueue: false });
       let user: User;
       let hostUser: User;
       if (users[0].role === ROLE.USER) {
@@ -57,7 +44,7 @@ export class OrdersService {
       if (user.point < amount) throw new HttpException('포인트 잔액이 부족합니다.', 400);
       await this.usersService.userPointTransaction({ manager, user, hostUser, amount, isCancel: false });
 
-      const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
+      const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds, isQueue: false });
 
       const filteredSeats = seats.filter((seat) => seat.isSoldOut);
 
@@ -78,8 +65,7 @@ export class OrdersService {
       return order;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.log(error.message);
-      throw new HttpException(error.message, error.status);
+      throw new HttpException(error.message, error.status || 500);
     } finally {
       await queryRunner.release();
     }
@@ -105,7 +91,7 @@ export class OrdersService {
     await queryRunner.startTransaction();
     try {
       const manager = queryRunner.manager;
-      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId] });
+      const users = await this.usersService.findUsersWithManager({ manager, userIds: [userId, hostId], isQueue: false });
       let user: User;
       let hostUser: User;
       if (users[0].role === ROLE.USER) {
@@ -117,7 +103,7 @@ export class OrdersService {
       }
       await this.usersService.userPointTransaction({ manager, user, hostUser, amount: order.amount, isCancel: true });
       // 좌석상태
-      const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds });
+      const seats = await this.seatsService.findSeatsWithManager({ manager, seatIds, isQueue: false });
       const filteredSeats = seats.filter((seat) => !seat.isSoldOut);
       if (filteredSeats.length) throw new ConflictException('이미 취소된 주문입니다.');
 
@@ -139,20 +125,4 @@ export class OrdersService {
   async findByUserId({ userId, page }: IOrdersServiceFindByUserId): Promise<Order[]> {
     return await this.ordersRepository.findByUserId({ userId, page });
   }
-}
-
-export interface IOrdersServiceCreate {
-  concertId: string;
-  userId: string;
-  amount: number;
-  seatIds: string[];
-}
-interface IOrdersServiceOrderCancel {
-  orderId: string;
-  userId: string;
-}
-
-interface IOrdersServiceFindByUserId {
-  userId: string;
-  page: number;
 }
