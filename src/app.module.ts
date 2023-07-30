@@ -11,6 +11,8 @@ import { UsersModule } from './apis/users/users.module';
 import { OrdersModule } from './apis/orders/orders.module';
 import { BullModule } from '@nestjs/bull';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ExpressAdapter } from '@bull-board/express';
 
 @Module({
   imports: [
@@ -37,6 +39,10 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
         host: 'my-redis',
         port: 6379,
       },
+    }),
+    BullBoardModule.forRoot({
+      route: '/queues',
+      adapter: ExpressAdapter,
     }),
     EventEmitterModule.forRoot(),
   ],
