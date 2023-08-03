@@ -1,15 +1,16 @@
-import { Body, Controller, Get, HttpException, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { AccessAuthGuard } from '../auth/guard/auth-guard';
-import { IRequest } from 'src/commons/interfaces/context';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { RolesGuard } from '../auth/guard/roles.guard';
-import { HasRoles } from '../auth/guard/roles.decorator';
-import { ROLE } from '../users/entities/user.entity';
-import { Order } from './entities/order.entity';
 import { OrderQueuesService } from './order-queues.service';
-import { BullBoardInstance, InjectBullBoard } from '@bull-board/nestjs';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
+import { AuthUserGuard } from 'src/commons/decorators/coustom-guards.decorator';
+import { PageReqDto } from 'src/commons/dto/page-req.dto';
+import { ApiGetItemsResponse, ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
+import { CreateOrderResDto, CreateQueueResDto, FindByUserIdResDto, OrderCancelResDto } from './dto/res.dto';
 
+@ApiTags('orders')
+@ApiExtraModels(CreateOrderDto, CreateOrderResDto, FindByUserIdResDto, OrderCancelResDto)
 @Controller('orders')
 export class OrdersController {
   constructor(
@@ -17,50 +18,53 @@ export class OrdersController {
     private readonly orderQueuesService: OrderQueuesService,
   ) {}
 
-  @HasRoles(ROLE.USER)
-  @UseGuards(AccessAuthGuard, RolesGuard)
+  @ApiPostResponse(CreateOrderResDto)
+  @AuthUserGuard()
   @Post()
-  create(
-    @Req() req: IRequest,
+  async create(
     @Body() createOrderDto: CreateOrderDto, //
-  ): Promise<Order> {
-    const userId = req.user.id;
+    @User() user: UserAfterAuth,
+  ): Promise<CreateOrderResDto> {
+    const userId = user.id;
     const { amount, concertId, seatIds } = createOrderDto;
-    return this.ordersService.create({ amount, concertId, seatIds, userId });
+    const { amount: _amount, createdAt, id, seatInfos, status } = await this.ordersService.create({ amount, concertId, seatIds, userId });
+    return { id, amount: _amount, seatInfos, status, createdAt };
   }
 
-  @HasRoles(ROLE.USER)
-  @UseGuards(AccessAuthGuard, RolesGuard)
+  @ApiPostResponse(CreateQueueResDto)
+  @AuthUserGuard()
   @Post('/queue')
   async createQueue(
-    @Req() req: IRequest,
     @Body() createOrderDto: CreateOrderDto, //
-  ) {
-    const userId = req.user.id;
+    @User() user: UserAfterAuth,
+  ): Promise<CreateQueueResDto> {
+    const userId = user.id;
     const { amount, concertId, seatIds } = createOrderDto;
-    return await this.orderQueuesService.addorderQueue({ amount, concertId, seatIds, userId });
+    const jobId = await this.orderQueuesService.addorderQueue({ amount, concertId, seatIds, userId });
+
+    return { jobId };
   }
 
-  @HasRoles(ROLE.USER)
-  @UseGuards(AccessAuthGuard, RolesGuard)
+  @ApiPostResponse(OrderCancelResDto)
+  @AuthUserGuard()
   @Post('/cancel/:orderId')
   orderCancel(
     @Param('orderId') orderId: string, //
-    @Req() req: IRequest,
-  ): Promise<Order> {
+    @User() user: UserAfterAuth,
+  ): Promise<OrderCancelResDto> {
     console.log(orderId);
-    const userId = req.user.id;
+    const userId = user.id;
     return this.ordersService.orderCancel({ orderId, userId });
   }
 
-  @HasRoles(ROLE.USER)
-  @UseGuards(AccessAuthGuard, RolesGuard)
+  @ApiGetItemsResponse(FindByUserIdResDto)
+  @AuthUserGuard()
   @Get()
   findByUserId(
-    @Req() req: IRequest, //
-    @Query('page') page: string,
-  ): Promise<Order[]> {
-    const userId = req.user.id;
-    return this.ordersService.findByUserId({ userId, page: +page });
+    @Query() { page, size }: PageReqDto, //
+    @User() user: UserAfterAuth,
+  ): Promise<FindByUserIdResDto[]> {
+    const userId = user.id;
+    return this.ordersService.findByUserId({ userId, page, size });
   }
 }

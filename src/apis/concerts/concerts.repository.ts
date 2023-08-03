@@ -45,14 +45,25 @@ export class ConcertsRepository {
 
   //-----------------------------조회-----------------------------//
 
-  async findConcerts({ page }: IConcertsRepositoryFindConcerts): Promise<Concert[]> {
-    return await this.concertsRepository
+  async findConcerts({ page, size }: IConcertsRepositoryFindConcerts): Promise<Concert[]> {
+    return await this.concertsRepository // 카테고리 이름, 콘서트 이름, 좌석정보? 이건필요? 상세 때만 넣기?
       .createQueryBuilder('concert')
-      .leftJoinAndSelect('concert.category', 'category')
-      .leftJoinAndSelect('concert.seats', 'seat')
-      .orderBy({ 'concert.createdAt': 'DESC', 'seat.grade': 'ASC', 'seat.seatNum': 'ASC' })
-      .take(12)
-      .skip((page - 1) * 12)
+      .select([
+        'concert.id',
+        'concert.name',
+        'concert.description',
+        'concert.address',
+        'concert.startDate',
+        'concert.endDate',
+        'concert.concertDate',
+        'concert.imageUrl',
+        'concert.createdAt',
+        'category.name',
+      ])
+      .leftJoin('concert.category', 'category')
+      .orderBy({ 'concert.createdAt': 'DESC' })
+      .take(size)
+      .skip((page - 1) * size)
       .getMany();
   }
 
@@ -77,15 +88,31 @@ export class ConcertsRepository {
       .getOne();
   }
 
-  async searchByNameAndCategory({ name, page }: IConcertsRepositorySearchByNameAndCategory): Promise<Concert[]> {
+  async searchByNameAndCategory({ keyword, page, size }: IConcertsRepositorySearchByNameAndCategory): Promise<Concert[]> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
-      .leftJoinAndSelect('concert.category', 'category')
-      .where('concert.name LIKE :name', { name: `%${name}%` })
-      .orWhere('category.name LIKE :category', { category: `%${name}%` })
+      .select([
+        'concert.id',
+        'concert.name',
+        'concert.description',
+        'concert.address',
+        'concert.startDate',
+        'concert.endDate',
+        'concert.concertDate',
+        'concert.imageUrl',
+        'category.name',
+      ])
+      .leftJoin('concert.category', 'category')
+      .where('concert.name LIKE :keyword', { keyword: `%${keyword}%` })
+      .orWhere('category.name LIKE :category', { category: `%${keyword}%` })
       .orderBy({ 'concert.createdAt': 'DESC' })
-      .take(12)
-      .skip((page - 1) * 12)
+      .take(size)
+      .skip((page - 1) * size)
       .getMany();
+  }
+
+  //-----------------------------수정-----------------------------//
+  async updateConcert({ concert, updateConcertDto }) {
+    return await this.concertsRepository.save({ ...concert, ...updateConcertDto });
   }
 }

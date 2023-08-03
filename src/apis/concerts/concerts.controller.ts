@@ -1,50 +1,74 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ConcertsService } from './concerts.service';
-import { AccessAuthGuard } from '../auth/guard/auth-guard';
-import { HasRoles } from '../auth/guard/roles.decorator';
-import { ROLE } from '../users/entities/user.entity';
-import { RolesGuard } from '../auth/guard/roles.guard';
+
 import { IRequest } from 'src/commons/interfaces/context';
 import { CreateConcertDto } from './dto/create-concert.dto';
 import { Concert } from './entities/concert.entity';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { PageReqDto, SearchReqDto } from 'src/commons/dto/page-req.dto';
+import { ApiGetItemsResponse, ApiGetResponse } from 'src/commons/decorators/swagger.decorator';
+import { UpdateConcertDto } from './dto/update-concert.dto';
+import { CreateConcertResDto, FindConcertsResDto, UpdateConcertResDto } from './dto/res.dto';
+import { AuthHostGuard } from 'src/commons/decorators/coustom-guards.decorator';
+import { CreateConcertDocs, UpdateConcertDocs } from './decorators/concerts-controller.decorator';
+import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 
+@ApiTags('concerts')
+@ApiExtraModels(PageReqDto, SearchReqDto, CreateConcertResDto, FindConcertsResDto, UpdateConcertResDto)
 @Controller('concerts')
 export class ConcertsController {
   constructor(
     private readonly concertsService: ConcertsService, //
   ) {}
 
-  @HasRoles(ROLE.HOST)
-  @UseGuards(AccessAuthGuard, RolesGuard)
+  @CreateConcertDocs()
+  @AuthHostGuard()
   @Post()
   createConcert(
     @Req() req: IRequest, //
     @Body() createConcertDto: CreateConcertDto,
-  ): Promise<Concert> {
+  ): Promise<CreateConcertResDto> {
     const userId = req.user.id;
 
-    return this.concertsService.create({ userId, createConcertDto });
+    const concert = this.concertsService.create({ userId, createConcertDto });
+    return concert;
   }
 
+  @ApiGetItemsResponse(FindConcertsResDto)
   @Get()
   findConcerts(
-    @Query('page') page: string, //
-  ): Promise<Concert[]> {
-    return this.concertsService.findConcerts({ page });
+    @Query() { page, size }: PageReqDto, //
+  ): Promise<FindConcertsResDto[]> {
+    return this.concertsService.findConcerts({ page, size });
   }
 
+  @ApiGetResponse(Concert)
   @Get('/:concertId')
-  findById(
+  async findById(
     @Param('concertId') concertId: string, //
   ): Promise<Concert> {
-    return this.concertsService.findById({ concertId });
+    const result = await this.concertsService.findById({ concertId });
+    return result;
   }
 
-  @Get('/search/name')
+  @ApiGetItemsResponse(FindConcertsResDto)
+  @Get('/search')
   searchByNameAndCategory(
-    @Query('name') name: string, //
-    @Query('page') page: string,
-  ): Promise<Concert[]> {
-    return this.concertsService.searchByNameAndCategory({ name, page });
+    @Query() { page, keyword, size }: SearchReqDto, //
+  ): Promise<FindConcertsResDto[]> {
+    return this.concertsService.searchByNameAndCategory({ keyword, page, size });
+  }
+
+  @UpdateConcertDocs()
+  @AuthHostGuard()
+  @Put('/:concertId')
+  updateConcert(
+    @Param('concertId') concertId: string, //
+    @Body() updateConcertDto: UpdateConcertDto,
+    @User() user: UserAfterAuth,
+  ): Promise<UpdateConcertResDto> {
+    console.log(user);
+    const userId = user.id;
+    return this.concertsService.updateConcert({ updateConcertDto, concertId, userId });
   }
 }

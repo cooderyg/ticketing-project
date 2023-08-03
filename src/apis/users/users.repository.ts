@@ -31,9 +31,11 @@ export class UsersRepository {
   }
 
   async findProfile({ userId }: IUserRepositoryFindProfile): Promise<User> {
-    return await this.usersRepository.findOne({
-      where: { id: userId },
-    });
+    return await this.usersRepository
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.nickname', 'user.point'])
+      .where('user.id = :userId', { userId })
+      .getOne();
   }
 
   async findUsersWithManager({ manager, userIds, isQueue }: IUsersRepositoryFindUsersById): Promise<User[]> {

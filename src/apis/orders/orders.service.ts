@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';
 import { IOrdersServiceCreate, IOrdersServiceFindByUserId, IOrdersServiceOrderCancel } from './interfaces/orders-service.interface';
+import { FindByUserIdResDto, OrderCancelResDto } from './dto/res.dto';
 
 @Injectable()
 export class OrdersService {
@@ -62,6 +63,7 @@ export class OrdersService {
 
       const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId, seatInfos });
       await queryRunner.commitTransaction();
+      console.log(order);
       return order;
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -71,7 +73,7 @@ export class OrdersService {
     }
   }
 
-  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<Order> {
+  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<OrderCancelResDto> {
     const order = await this.ordersRepository.findOne({ orderId });
     if (order.user.id !== userId) throw new HttpException('주문취소 권한이 없습니다', 401);
     if (order.status === ORDERSTATUS.CANCEL) throw new ConflictException('이미 취소된 결제입니다.');
@@ -122,7 +124,7 @@ export class OrdersService {
     }
   }
 
-  async findByUserId({ userId, page }: IOrdersServiceFindByUserId): Promise<Order[]> {
-    return await this.ordersRepository.findByUserId({ userId, page });
+  async findByUserId({ userId, page, size }: IOrdersServiceFindByUserId): Promise<FindByUserIdResDto[]> {
+    return await this.ordersRepository.findByUserId({ userId, page, size });
   }
 }

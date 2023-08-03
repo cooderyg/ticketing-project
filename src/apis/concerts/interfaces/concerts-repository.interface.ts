@@ -11,6 +11,7 @@ export interface IConcertsRepositoryCreate {
 }
 export interface IConcertsRepositoryFindConcerts {
   page: number;
+  size: number;
 }
 
 export interface IConcertsRepositoryFindById {
@@ -22,6 +23,7 @@ export interface IConcertsRepositoryFindOneIsNotSoldOut {
 }
 
 export interface IConcertsRepositorySearchByNameAndCategory {
-  name: string;
+  keyword: string;
   page: number;
+  size: number;
 }

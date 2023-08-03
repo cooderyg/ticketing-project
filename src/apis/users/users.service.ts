@@ -31,6 +31,10 @@ export class UsersService {
     return newUser;
   }
 
+  async findOneByEmail({ email }) {
+    return await this.findOneByEmail({ email });
+  }
+
   async findProfile({ userId }: IUsersServiceFindProfile): Promise<User> {
     return await this.usersRepository.findProfile({ userId });
   }

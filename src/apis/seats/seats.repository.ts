@@ -7,7 +7,7 @@ import {
   ISeatsRepositoryFindSeatsByConcertId,
   ISeatsRepositoryFindSeatsWithManager,
   ISeatsRepositorySeatsSoldOutWithManager,
-} from './interfaces/seats.repository.interface';
+} from './interfaces/seats-repository.interface';
 
 @Injectable()
 export class SeatsRepository {
@@ -19,9 +19,7 @@ export class SeatsRepository {
   async findSeatsByConcertId({ concertId }: ISeatsRepositoryFindSeatsByConcertId): Promise<Seat[]> {
     return await this.seatsRepository.find({
       where: {
-        concert: {
-          id: concertId,
-        },
+        concert: { id: concertId },
       },
     });
   }

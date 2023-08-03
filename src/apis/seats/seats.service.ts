@@ -7,7 +7,7 @@ import {
   ISeatsServiceFindSeatsByConcertId,
   ISeatsServiceSeatsSoldOutWithManager,
   ISeatsServicefindSeatsWithManager,
-} from './interfaces/seats.service.interface';
+} from './interfaces/seats-service.interface';
 
 @Injectable()
 export class SeatsService {

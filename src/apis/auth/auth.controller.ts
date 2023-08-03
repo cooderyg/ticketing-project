@@ -1,21 +1,64 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
+import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { LoginResDto, LogoutResDto, RefreshResDto } from './dto/res.dto';
+import { LogInDocs } from './decorators/auth-controller.decorator';
+import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
+import { ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
+import { AccessAuthGuard, RefreshAuthGuard } from './guard/auth.guard';
+import { IRequest } from 'src/commons/interfaces/context';
 
+@ApiExtraModels(LoginResDto, RefreshResDto, LogoutResDto)
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService, //
   ) {}
+
+  @LogInDocs()
   @Post('/login')
   async logIn(
     @Body() loginDto: LoginDto, //
-    @Res() res: Response,
-  ): Promise<Response> {
-    const cookie = await this.authService.login({ loginDto });
-    res.setHeader('Set-Cookie', cookie);
-    console.log(cookie);
-    return res.json({ message: '로그인을 성공적으로 완료하였습니다.' });
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginResDto> {
+    const { accessToken, refreshToken } = await this.authService.login({ loginDto });
+    console.log(refreshToken);
+    res.cookie('refreshToken', refreshToken);
+    // , { httpOnly: true, secure: true }
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    console.log(accessToken);
+    return { message: '로그인을 성공적으로 완료하였습니다.' };
+  }
+
+  @ApiPostResponse(AccessAuthGuard)
+  @UseGuards(AccessAuthGuard)
+  @Post('logout')
+  async logout(
+    @Res({ passthrough: true }) res: Response,
+    @User() user: UserAfterAuth, //
+  ): Promise<LogoutResDto> {
+    this.authService.logout({ userId: user.id });
+    res.cookie('refreshToken', '');
+    // , { httpOnly: true, secure: true }
+    return { message: '로그아웃을 성공적으로 완료하였습니다.' };
+  }
+
+  @ApiPostResponse(RefreshResDto)
+  @ApiBearerAuth()
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh')
+  async refresh(
+    @Req() req: IRequest, //
+    @Res({ passthrough: true }) res: Response,
+    @User() user: UserAfterAuth,
+  ): Promise<RefreshResDto> {
+    const token = req.cookies['refreshToken'];
+    const accessToken = await this.authService.refresh({ token, user });
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    console.log(accessToken);
+    return { message: 'refresh' };
   }
 }

@@ -38,16 +38,16 @@ export class OrdersRepository {
       .getOne();
   }
 
-  async findByUserId({ userId, page }: IOrdersRepositoryFindByUserId): Promise<Order[]> {
-    console.log(userId, page);
+  async findByUserId({ userId, page, size }: IOrdersRepositoryFindByUserId): Promise<Order[]> {
     return await this.ordersRepository
       .createQueryBuilder('order')
-      .leftJoinAndSelect('order.user', 'user')
-      .leftJoinAndSelect('order.concert', 'concert')
+      .select(['order.id', 'order.status', 'order.amount', 'order.seatInfos', 'order.createdAt', 'concert.name', 'concert.concertDate'])
+      .leftJoin('order.user', 'user')
+      .leftJoin('order.concert', 'concert')
       .where('user.id = :userId', { userId })
       .orderBy('order.createdAt', 'DESC')
-      .take(10)
-      .skip((page - 1) * 10)
+      .take(size)
+      .skip((page - 1) * size)
       .getMany();
   }
 

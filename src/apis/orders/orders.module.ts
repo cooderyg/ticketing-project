@@ -16,6 +16,7 @@ import { Queue } from 'bull';
 import { ExpressAdapter } from '@bull-board/express';
 import { createBullBoard } from '@bull-board/api';
 import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
     ConcertsModule,
     UsersModule,
     SeatsModule,
+    EventsModule,
     BullModule.registerQueue({
       name: 'orderQueue',
     }),

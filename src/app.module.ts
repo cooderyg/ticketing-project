@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,12 +13,14 @@ import { BullModule } from '@nestjs/bull';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
-
+import { LoggerMiddleware } from './commons/middlewares/logger.middleware';
+import { EventsModule } from './apis/events/events.module';
 @Module({
   imports: [
     AuthModule,
     CategoriesModule,
     ConcertsModule,
+    EventsModule,
     SeatsModule,
     OrdersModule,
     UsersModule,
@@ -49,6 +51,10 @@ import { ExpressAdapter } from '@bull-board/express';
   controllers: [
     AppController, //
   ],
-  providers: [AppService],
+  providers: [AppService, Logger],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

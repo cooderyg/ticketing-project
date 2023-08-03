@@ -28,4 +28,5 @@ export interface IOrdersRepositoryFindOne {
 export interface IOrdersRepositoryFindByUserId {
   userId: string;
   page: number;
+  size: number;
 }

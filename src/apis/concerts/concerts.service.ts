@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConcertsRepository } from './concerts.repository';
 import { Concert } from './entities/concert.entity';
 import { SeatsService } from '../seats/seats.service';
@@ -17,9 +17,7 @@ export class ConcertsService {
   ) {}
   async create({ userId, createConcertDto }: IConcertsServiceCreate): Promise<Concert> {
     const { categoryId, endDate, startDate, name, concertDate, seatInfo, address, description, imageUrl } = createConcertDto;
-    const changedEndDate = new Date(endDate * 1000);
-    const changedStartDate = new Date(startDate * 1000);
-    const changedConcertDate = new Date(concertDate * 1000);
+    console.log(endDate);
     const concert = await this.concertsRepository.create({
       userId, //
       categoryId,
@@ -27,9 +25,9 @@ export class ConcertsService {
       address,
       description,
       imageUrl,
-      endDate: changedEndDate,
-      startDate: changedStartDate,
-      concertDate: changedConcertDate,
+      endDate,
+      startDate,
+      concertDate,
     });
 
     await this.seatsService.creat({ concertId: concert.id, seatInfo });
@@ -37,15 +35,24 @@ export class ConcertsService {
     return concert;
   }
 
-  async findConcerts({ page }: IConcertsServiceFindConcerts): Promise<Concert[]> {
-    return await this.concertsRepository.findConcerts({ page: +page });
+  async findConcerts({ page, size }: IConcertsServiceFindConcerts): Promise<Concert[]> {
+    return await this.concertsRepository.findConcerts({ page, size });
   }
 
   async findById({ concertId }: IConcertsServiceFindById) {
-    return await this.concertsRepository.findById({ concertId });
+    const result = await this.concertsRepository.findById({ concertId });
+    if (!result) throw new NotFoundException();
+    return result;
   }
 
-  async searchByNameAndCategory({ name, page }: IConcertsServiceSearchByNameAndCategory): Promise<Concert[]> {
-    return await this.concertsRepository.searchByNameAndCategory({ name, page: +page });
+  async searchByNameAndCategory({ keyword, page, size }: IConcertsServiceSearchByNameAndCategory): Promise<Concert[]> {
+    return await this.concertsRepository.searchByNameAndCategory({ keyword, page, size });
+  }
+
+  async updateConcert({ updateConcertDto, concertId, userId }) {
+    const concert = await this.concertsRepository.findById({ concertId });
+    if (concert.user.id !== userId) throw new HttpException('수정할 권한이 없습니다.', 401);
+    const updatedConcert = await this.concertsRepository.updateConcert({ concert, updateConcertDto });
+    return updatedConcert;
   }
 }

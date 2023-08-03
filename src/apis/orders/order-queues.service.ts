@@ -1,5 +1,4 @@
 import { ConflictException, HttpException, Injectable } from '@nestjs/common';
-import { Order } from './entities/order.entity';
 import { ROLE, User } from '../users/entities/user.entity';
 import { SeatsService } from '../seats/seats.service';
 import { OrdersRepository } from './orders.repository';
@@ -7,11 +6,11 @@ import { ConcertsService } from '../concerts/concerts.service';
 import { UsersService } from '../users/users.service';
 import { DataSource } from 'typeorm';
 import { Queue } from 'bull';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectQueue } from '@nestjs/bull';
 import { v4 } from 'uuid';
-import { IOrderQueuesServiceListener, IOrdersServiceCreateQueue, IwaitResultReturn } from './interfaces/order-queues-service.interface';
+import { IOrdersServiceCreateQueue } from './interfaces/order-queues-service.interface';
 import { IOrdersServiceCreate } from './interfaces/orders-service.interface';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class OrderQueuesService {
@@ -23,20 +22,17 @@ export class OrderQueuesService {
     private readonly dataSource: DataSource,
     @InjectQueue('orderQueue')
     private readonly orderQueue: Queue,
-    private eventEmitter: EventEmitter2,
+    private readonly eventsGateway: EventsGateway,
   ) {}
 
-  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
+  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<string> {
     const uuid = v4();
     await this.orderQueue.add(
-      'addOrderQueue', //
+      'addOrderQueue',
       { concertId, userId, amount, seatIds, uuid },
       { removeOnComplete: true, removeOnFail: true, jobId: uuid },
     );
-    const result = await this.waitResult({ uuid });
-    console.log(result);
-    if (result?.error) throw result.error;
-    return result.order;
+    return uuid;
   }
 
   async create({ concertId, userId, amount, seatIds, uuid }: IOrdersServiceCreateQueue): Promise<void> {
@@ -83,22 +79,14 @@ export class OrderQueuesService {
 
       const order = await this.ordersRepository.createOrder({ manager, userId, amount, concertId, seatInfos });
       await queryRunner.commitTransaction();
-      this.eventEmitter.emit(uuid, { success: true, order });
+
+      this.eventsGateway.orderEnd({ jobId: uuid, success: true, order });
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.eventEmitter.emit(uuid, { success: false, error });
+      this.eventsGateway.orderEnd({ jobId: uuid, success: false, error });
     } finally {
       await queryRunner.release();
       return;
     }
-  }
-
-  waitResult({ uuid }): Promise<IwaitResultReturn> {
-    return new Promise((resolve, reject) => {
-      const listener = ({ success, error, order }: IOrderQueuesServiceListener) => {
-        success ? resolve({ message: '주문성공', order }) : reject(error);
-      };
-      this.eventEmitter.once(uuid, listener);
-    });
   }
 }

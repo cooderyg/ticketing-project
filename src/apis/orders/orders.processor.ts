@@ -29,3 +29,5 @@ export class OrderProcessor {
   //   throw new HttpException(error.message, error.status);
   // }
 }
+// 슬랙, 그라파나, 카프카,aws키바나 대기하고 유저한테 반환하는 것은 불가능
+// 애초에 부하를 줄이기 위해 큐를 사용했는데 대기를 하고 있는 것 자체가 이상 함 큐를 이상하게 사용중

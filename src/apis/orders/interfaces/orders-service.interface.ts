@@ -12,4 +12,5 @@ export interface IOrdersServiceOrderCancel {
 export interface IOrdersServiceFindByUserId {
   userId: string;
   page: number;
+  size: number;
 }
