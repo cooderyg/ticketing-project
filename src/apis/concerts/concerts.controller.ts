@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ConcertsService } from './concerts.service';
-
 import { IRequest } from 'src/commons/interfaces/context';
 import { CreateConcertDto } from './dto/create-concert.dto';
 import { Concert } from './entities/concert.entity';
@@ -14,7 +13,7 @@ import { CreateConcertDocs, UpdateConcertDocs } from './decorators/concerts-cont
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 
 @ApiTags('concerts')
-@ApiExtraModels(PageReqDto, SearchReqDto, CreateConcertResDto, FindConcertsResDto, UpdateConcertResDto)
+@ApiExtraModels(PageReqDto, SearchReqDto, CreateConcertResDto, FindConcertsResDto, UpdateConcertResDto, Concert)
 @Controller('concerts')
 export class ConcertsController {
   constructor(

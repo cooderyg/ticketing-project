@@ -14,7 +14,7 @@ export class SeatsContoller {
 
   @ApiGetItemsResponse(SeatGetAllResDto)
   @Get('/:concertId')
-  async getall(@Param('concertId') concertId: string): Promise<SeatGetAllResDto[]> {
+  async findSeats(@Param('concertId') concertId: string): Promise<SeatGetAllResDto[]> {
     const seats = await this.seatsService.findSeatsByConcertId({ concertId });
     return seats;
   }

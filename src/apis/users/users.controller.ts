@@ -3,9 +3,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AccessAuthGuard } from '../auth/guard/auth.guard';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
-import { ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
 import { CreateUserResDto, findProfileResDto } from './dto/res.dto';
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
+import { CreateUserDocs, FindProfileDocs } from './decorators/users-controller.decorator';
 
 @ApiExtraModels(CreateUserResDto, findProfileResDto)
 @ApiTags('users')
@@ -15,7 +15,7 @@ export class UsersController {
     private readonly usersService: UsersService, //
   ) {}
 
-  @ApiPostResponse(CreateUserResDto)
+  @CreateUserDocs()
   @Post()
   async createUser(
     @Body() createUserDto: CreateUserDto, //
@@ -24,6 +24,7 @@ export class UsersController {
     return { id, email, nickname, point };
   }
 
+  @FindProfileDocs()
   @UseGuards(AccessAuthGuard)
   @Get('/profile')
   async findProfile(

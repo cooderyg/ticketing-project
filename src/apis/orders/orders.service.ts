@@ -7,7 +7,7 @@ import { UsersService } from '../users/users.service';
 import { SeatsService } from '../seats/seats.service';
 import { ROLE, User } from '../users/entities/user.entity';
 import { IOrdersServiceCreate, IOrdersServiceFindByUserId, IOrdersServiceOrderCancel } from './interfaces/orders-service.interface';
-import { FindByUserIdResDto, OrderCancelResDto } from './dto/res.dto';
+import { FindByUserIdResDto, CancelOrderResDto } from './dto/res.dto';
 
 @Injectable()
 export class OrdersService {
@@ -19,7 +19,7 @@ export class OrdersService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
+  async createOrder({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
     const concert = await this.concertsService.findById({ concertId });
 
     if (!concert) throw new HttpException('해당 콘서트를 찾을 수 없습니다.', 404);
@@ -73,9 +73,9 @@ export class OrdersService {
     }
   }
 
-  async orderCancel({ orderId, userId }: IOrdersServiceOrderCancel): Promise<OrderCancelResDto> {
+  async cancelOrder({ orderId, userId }: IOrdersServiceOrderCancel): Promise<CancelOrderResDto> {
     const order = await this.ordersRepository.findOne({ orderId });
-    if (order.user.id !== userId) throw new HttpException('주문취소 권한이 없습니다', 401);
+    if (order.user.id !== userId) throw new HttpException('주문취소 권한이 없습니다.', 401);
     if (order.status === ORDERSTATUS.CANCEL) throw new ConflictException('이미 취소된 결제입니다.');
 
     const orderSeatInfos = order.seatInfos;

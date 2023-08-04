@@ -38,7 +38,7 @@ export class AuthService {
 
   async logout({ userId }): Promise<void> {
     const refreshToken = await this.authRepository.findOneByUserId({ userId });
-    if (!refreshToken) throw new BadRequestException();
+    if (!refreshToken) throw new BadRequestException('잘못된 요청입니다.');
     await this.authRepository.updateLogout({ refreshToken });
   }
 
@@ -51,7 +51,7 @@ export class AuthService {
 
   async refresh({ token, user }: IAuthServiceRefresh): Promise<string> {
     const refreshTokenEntity = await this.authRepository.findOneByToken({ token });
-    if (!refreshTokenEntity) throw new BadRequestException();
+    if (!refreshTokenEntity) throw new BadRequestException('잘못된 요청입니다.');
 
     return this.getAccessToken({ user });
   }

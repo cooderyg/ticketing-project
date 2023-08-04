@@ -8,7 +8,7 @@ export class CreateQueueResDto {
   jobId: string;
 }
 
-export class OrderCancelResDto extends PickType(Order, ['id', 'status', 'updatedAt']) {}
+export class CancelOrderResDto extends PickType(Order, ['id', 'status', 'updatedAt']) {}
 
 export class FindByUserIdResDto extends CreateOrderResDto {
   @ApiProperty({ example: 'concert: { name: "싸이의 흠뻑쑈", concertDate: "2023-08-10" }', description: '공연 이름, 공연 날짜' })

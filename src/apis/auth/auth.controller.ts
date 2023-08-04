@@ -2,11 +2,10 @@ import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
-import { ApiBearerAuth, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { LoginResDto, LogoutResDto, RefreshResDto } from './dto/res.dto';
-import { LogInDocs } from './decorators/auth-controller.decorator';
+import { LogInDocs, LogoutDocs, RefreshDocs } from './decorators/auth-controller.decorator';
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
-import { ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
 import { AccessAuthGuard, RefreshAuthGuard } from './guard/auth.guard';
 import { IRequest } from 'src/commons/interfaces/context';
 
@@ -25,7 +24,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResDto> {
     const { accessToken, refreshToken } = await this.authService.login({ loginDto });
-    console.log(refreshToken);
     res.cookie('refreshToken', refreshToken);
     // , { httpOnly: true, secure: true }
     res.setHeader('Authorization', `Bearer ${accessToken}`);
@@ -33,7 +31,7 @@ export class AuthController {
     return { message: '로그인을 성공적으로 완료하였습니다.' };
   }
 
-  @ApiPostResponse(AccessAuthGuard)
+  @LogoutDocs()
   @UseGuards(AccessAuthGuard)
   @Post('logout')
   async logout(
@@ -46,8 +44,7 @@ export class AuthController {
     return { message: '로그아웃을 성공적으로 완료하였습니다.' };
   }
 
-  @ApiPostResponse(RefreshResDto)
-  @ApiBearerAuth()
+  @RefreshDocs()
   @UseGuards(RefreshAuthGuard)
   @Post('refresh')
   async refresh(

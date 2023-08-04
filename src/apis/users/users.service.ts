@@ -1,9 +1,10 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import {
   IUsersServiceCreateUser,
+  IUsersServiceFindOneByEmail,
   IUsersServiceFindProfile,
   IUsersServiceFindUsersById,
   IUsersServiceUserPointTransaction,
@@ -31,12 +32,14 @@ export class UsersService {
     return newUser;
   }
 
-  async findOneByEmail({ email }) {
+  async findOneByEmail({ email }: IUsersServiceFindOneByEmail): Promise<User> {
     return await this.findOneByEmail({ email });
   }
 
   async findProfile({ userId }: IUsersServiceFindProfile): Promise<User> {
-    return await this.usersRepository.findProfile({ userId });
+    const user = await this.usersRepository.findProfile({ userId });
+    if (!user) throw new NotFoundException('해당 유저를 찾을 수 없습니다.');
+    return user;
   }
 
   async findUsersWithManager({ manager, userIds, isQueue }: IUsersServiceFindUsersById): Promise<User[]> {

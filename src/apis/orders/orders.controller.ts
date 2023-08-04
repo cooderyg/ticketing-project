@@ -6,11 +6,11 @@ import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 import { AuthUserGuard } from 'src/commons/decorators/coustom-guards.decorator';
 import { PageReqDto } from 'src/commons/dto/page-req.dto';
-import { ApiGetItemsResponse, ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
-import { CreateOrderResDto, CreateQueueResDto, FindByUserIdResDto, OrderCancelResDto } from './dto/res.dto';
+import { CreateOrderResDto, CreateQueueResDto, FindByUserIdResDto, CancelOrderResDto } from './dto/res.dto';
+import { CreateOrderDocs, CreateQueueOrderDocs, FindByUserIdDocs, CancelOrderDocs } from './decorators/orders-controller.decorator';
 
 @ApiTags('orders')
-@ApiExtraModels(CreateOrderDto, CreateOrderResDto, FindByUserIdResDto, OrderCancelResDto)
+@ApiExtraModels(CreateOrderDto, CreateOrderResDto, FindByUserIdResDto, CancelOrderResDto, CreateQueueResDto)
 @Controller('orders')
 export class OrdersController {
   constructor(
@@ -18,20 +18,20 @@ export class OrdersController {
     private readonly orderQueuesService: OrderQueuesService,
   ) {}
 
-  @ApiPostResponse(CreateOrderResDto)
+  @CreateOrderDocs()
   @AuthUserGuard()
   @Post()
-  async create(
+  async createOrder(
     @Body() createOrderDto: CreateOrderDto, //
     @User() user: UserAfterAuth,
   ): Promise<CreateOrderResDto> {
     const userId = user.id;
     const { amount, concertId, seatIds } = createOrderDto;
-    const { amount: _amount, createdAt, id, seatInfos, status } = await this.ordersService.create({ amount, concertId, seatIds, userId });
+    const { amount: _amount, createdAt, id, seatInfos, status } = await this.ordersService.createOrder({ amount, concertId, seatIds, userId });
     return { id, amount: _amount, seatInfos, status, createdAt };
   }
 
-  @ApiPostResponse(CreateQueueResDto)
+  @CreateQueueOrderDocs()
   @AuthUserGuard()
   @Post('/queue')
   async createQueue(
@@ -45,19 +45,19 @@ export class OrdersController {
     return { jobId };
   }
 
-  @ApiPostResponse(OrderCancelResDto)
+  @CancelOrderDocs()
   @AuthUserGuard()
   @Post('/cancel/:orderId')
-  orderCancel(
+  cancelOrder(
     @Param('orderId') orderId: string, //
     @User() user: UserAfterAuth,
-  ): Promise<OrderCancelResDto> {
+  ): Promise<CancelOrderResDto> {
     console.log(orderId);
     const userId = user.id;
-    return this.ordersService.orderCancel({ orderId, userId });
+    return this.ordersService.cancelOrder({ orderId, userId });
   }
 
-  @ApiGetItemsResponse(FindByUserIdResDto)
+  @FindByUserIdDocs()
   @AuthUserGuard()
   @Get()
   findByUserId(
