@@ -33,7 +33,7 @@ export class UsersService {
   }
 
   async findOneByEmail({ email }: IUsersServiceFindOneByEmail): Promise<User> {
-    return await this.findOneByEmail({ email });
+    return await this.usersRepository.findOneByEmail({ email });
   }
 
   async findProfile({ userId }: IUsersServiceFindProfile): Promise<User> {
