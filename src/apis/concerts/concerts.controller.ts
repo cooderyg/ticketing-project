@@ -66,7 +66,6 @@ export class ConcertsController {
     @Body() updateConcertDto: UpdateConcertDto,
     @User() user: UserAfterAuth,
   ): Promise<UpdateConcertResDto> {
-    console.log(user);
     const userId = user.id;
     return this.concertsService.updateConcert({ updateConcertDto, concertId, userId });
   }

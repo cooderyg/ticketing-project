@@ -26,7 +26,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // 연결 시
   handleConnection(@ConnectedSocket() socket: Socket): void {
     console.log(`${socket.id} 소켓 연결`);
-    // socket.handshake.headers; // header에 토큰 값
     this.wsClients.push(socket);
   }
 
