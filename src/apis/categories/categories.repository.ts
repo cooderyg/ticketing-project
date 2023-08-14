@@ -11,8 +11,6 @@ export class CategoriesRepository {
     private readonly categoriesRepository: Repository<Category>,
   ) {}
   async create({ createCategoryDto }: ICategoriesRepositoryCreate): Promise<Category> {
-    return await this.categoriesRepository.save({
-      ...createCategoryDto,
-    });
+    return await this.categoriesRepository.save(createCategoryDto);
   }
 }

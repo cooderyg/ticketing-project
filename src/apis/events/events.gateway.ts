@@ -23,7 +23,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   wsClients = [];
 
-  // 연결 시
   handleConnection(@ConnectedSocket() socket: Socket): void {
     console.log(`${socket.id} 소켓 연결`);
     this.wsClients.push(socket);
