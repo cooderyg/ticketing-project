@@ -12,12 +12,14 @@
 - Socket.IO
 
 ## 📌주요 기능
-- 공연좌석 예매 기능
-- 공연생성 기능
-- Role Guard사용으로 user, host, admin 분리
-- Login Access Token, Refresh Token
+- 공연좌석 지정예매 기능
+- 등급별 공연좌석 생성 기능
 - Bull Queue 대기열 기능
-- 공연검색 기능 
+- Role Guard사용으로 user, host, admin 분리
+- Swagger를 활용한 API DOCS
+- Login Access Token, Refresh Token
+- 공연검색 기능
+ 
 
 ## 📐ERD 설계
 
@@ -34,6 +36,29 @@ client로 반환하는 값이 주문실패인 경우에도 성공을 응답하�
 
 ### 🌟 해결방안 1 Event Emitter
 Event Emitter를 활용하여 Bull Queue Order Job 종료까지 서버 내부에 Event Listener를 통해 대기 후 응답 반환 
+```javascript
+@Injectable()
+export class OrderQueuesService {
+  constructor(
+    @InjectQueue('orderQueue')
+    private readonly orderQueue: Queue,
+    private eventEmitter: EventEmitter2,
+  ) {}
+
+  async addorderQueue({ concertId, userId, amount, seatIds }: IOrdersServiceCreate): Promise<Order> {
+    const uuid = v4();
+    await this.orderQueue.add(
+      'addOrderQueue', //
+      { concertId, userId, amount, seatIds, uuid },
+      { removeOnComplete: true, removeOnFail: true, jobId: uuid },
+    );
+    const result = await this.waitResult({ uuid });
+    console.log(result);
+    if (result?.error) throw result.error;
+    return result.order;
+  }
+}
+```
 
 #### 🌩️Event Emitter 활용의 문제점
 ##### 대기를 하고 있기 때문에 Bull Queue 비동기를 제대로 활용하지 못함(대기상태 추가로 성능저하)
@@ -43,12 +68,32 @@ Event Emitter를 활용하여 Bull Queue Order Job 종료까지 서버 내부에
 2. 이후 Client에서 Socket.IO Event Listener를 활용해 Job ID로 이벤트를 생성    
 3. Bull Queue에서 Job이 완료되면 Server에서 Socket.IO를 통해 Job ID로 Event Emit
 4. Client에서 Event를 받고 해당 결과를 화면에 출력
+```javascript
+// ...(Server Socket.IO 코드 중략)
+  @SubscribeMessage('orderStart')
+  orderStart(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+    const { jobId } = data;
+    const index = this.wsClients.findIndex((client) => client === socket);
+    this.wsClients[index].data.jobId = jobId;
+  }
+
+  orderEnd({ jobId, success, order, error }: IEventsGatewayOrderEnd): void {
+    const foundSocket = this.wsClients.find((wsClient) => wsClient.data.jobId === jobId);
+    if (foundSocket) {
+      success //
+        ? this.server.to(foundSocket.id).emit('orderEnd', { success, order })
+        : this.server.to(foundSocket.id).emit('orderEnd', { success, error });
+    }
+  }
+```
 
 #### 🌩️Socket.IO 통신 활용의 문제점
 ##### Bull Queue는 다수의 인원이 몰릴 때를 대비한 대기열이기 때문에 다수의 인원이 Socket을 Connect해야 함
 ##### 다수의 인원이 Connect하면 리소스가 많이 소모됨  
 
-#### 📎비동기를 활용하지 못하는 해결방안 1보다는 활용할 수 있는 해결방안 2를 선택
+### 📎비동기를 활용하지 못하는 해결방안 1보다는 활용할 수 있는 해결방안 2를 선택
+
+<br />
 
 ## 🔒Transaction Lock 동시성 제어 중 DeadLock 발생
 
@@ -65,20 +110,20 @@ Event Emitter를 활용하여 Bull Queue Order Job 종료까지 서버 내부에
 
 
 ## 🧑‍💻티켓팅 프로젝트를 통한 학습 블로깅
-<a href="https://cooder.tistory.com/60" target="_blank">[TIL] 티켓팅 프로젝트</a>
+<a href="https://cooder.tistory.com/60">[TIL] 티켓팅 프로젝트</a>
 
-<a href="https://cooder.tistory.com/61" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Role Guard</a> 
+<a href="https://cooder.tistory.com/61">[TIL] 티켓팅 프로젝트 Nest JS Role Guard</a> 
 
-<a href="https://cooder.tistory.com/62" target="_blank">[TIL] Promise all & transaction</a> 
+<a href="https://cooder.tistory.com/62">[TIL] Promise all & transaction</a> 
 
-<a href="https://cooder.tistory.com/63" target="_blank">[TIL] 티켓팅 프로젝트 Jmeter 동시성 테스트</a> 
+<a href="https://cooder.tistory.com/63">[TIL] 티켓팅 프로젝트 Jmeter 동시성 테스트</a> 
 
-<a href="https://cooder.tistory.com/64" target="_blank">[TIL] 티켓팅 프로젝트 데드 락</a> 
+<a href="https://cooder.tistory.com/64">[TIL] 티켓팅 프로젝트 데드 락</a> 
 
-<a href="https://cooder.tistory.com/65" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Bull Queue</a> 
+<a href="https://cooder.tistory.com/65">[TIL] 티켓팅 프로젝트 Nest JS Bull Queue</a> 
 
-<a href="https://cooder.tistory.com/66" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Event Emitter</a> 
+<a href="https://cooder.tistory.com/66">[TIL] 티켓팅 프로젝트 Nest JS Event Emitter</a> 
 
-<a href="https://cooder.tistory.com/67" target="_blank">[TIL] 티켓팅 프로젝트 bull board</a> 
+<a href="https://cooder.tistory.com/67">[TIL] 티켓팅 프로젝트 bull board</a> 
 
-<a href="https://cooder.tistory.com/68" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS socket IO</a> 
+<a href="https://cooder.tistory.com/68">[TIL] 티켓팅 프로젝트 Nest JS socket IO</a> 
