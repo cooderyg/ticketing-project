@@ -46,12 +46,20 @@
 
 
 ## 티켓팅 프로젝트를 통한 학습 블로깅
-#### [[TIL] 티켓팅 프로젝트](https://cooder.tistory.com/60) 
-#### [[TIL] 티켓팅 프로젝트 Nest JS Role Guard](https://cooder.tistory.com/61) 
-#### [[TIL] Promise all & transaction](https://cooder.tistory.com/62) 
-#### [[TIL] 티켓팅 프로젝트 Jmeter 동시성 테스트](https://cooder.tistory.com/63) 
-#### [[TIL] 티켓팅 프로젝트 데드 락](https://cooder.tistory.com/64) 
-#### [[TIL] 티켓팅 프로젝트 Nest JS Bull Queue](https://cooder.tistory.com/65) 
-#### [[TIL] 티켓팅 프로젝트 Nest JS Event Emitter](https://cooder.tistory.com/66) 
-#### [[TIL] 티켓팅 프로젝트 bull board](https://cooder.tistory.com/67) 
-#### [[TIL] 티켓팅 프로젝트 Nest JS socket IO](https://cooder.tistory.com/68)
+<a href="https://cooder.tistory.com/60" target="_blank">[TIL] 티켓팅 프로젝트</a>
+
+<a href="https://cooder.tistory.com/61" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Role Guard</a> 
+
+<a href="https://cooder.tistory.com/62" target="_blank">[TIL] Promise all & transaction</a> 
+
+<a href="https://cooder.tistory.com/63" target="_blank">[TIL] 티켓팅 프로젝트 Jmeter 동시성 테스트</a> 
+
+<a href="https://cooder.tistory.com/64" target="_blank">[TIL] 티켓팅 프로젝트 데드 락</a> 
+
+<a href="https://cooder.tistory.com/65" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Bull Queue</a> 
+
+<a href="https://cooder.tistory.com/66" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS Event Emitter</a> 
+
+<a href="https://cooder.tistory.com/67" target="_blank">[TIL] 티켓팅 프로젝트 bull board</a> 
+
+<a href="https://cooder.tistory.com/68" target="_blank">[TIL] 티켓팅 프로젝트 Nest JS socket IO</a> 
