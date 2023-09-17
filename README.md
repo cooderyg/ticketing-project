@@ -101,12 +101,12 @@ export class OrderQueuesService {
 
 #### Seat에 lock하고 있는 Transaction과 User에 Lock하고 있는 Transaction이 서로 대기하고 있는 상태로 DeadLock 발생 
 
-<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/0624ab40-e114-4527-a857-37337d4e9502" width="100%" />
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/d0497d36-9375-406a-9a9d-bd33622b2999" width="100%" />
 
 ### 🗝️해결방법
 #### 단방향으로 Transaction Lock이 걸리도록 코드 수정 
 
-<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/a1f7ce7c-861a-4a54-aabf-6da470f734e1" width="100%" />
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/e0f53ea6-962a-4b87-bd14-9876d4cc2130" width="100%" />
 
 
 ## 🧑‍💻티켓팅 프로젝트를 통한 학습 블로깅
