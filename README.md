@@ -1,73 +1,57 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 🎟️티켓팅 프로젝트
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## ⏰개발 기간
+2023.07.25 - 2023.08.04
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🖥️개발환경
+- Nest JS
+- TypeScript
+- TypeORM
+- MySQL
+- Bull Queue
+- Socket.IO
 
-## Description
+## 📌주요 기능
+- 공연좌석 예매 기능
+- 공연생성 기능
+- Role Guard사용으로 user, host, admin 분리
+- Login Access Token, Refresh Token
+- Bull Queue 대기열 기능
+- 공연검색 기능 
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📐ERD 설계
 
-## Installation
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/bac3b0e2-7c12-4cc4-984f-1390dba3b2b8" width="100%">
 
-```bash
-$ yarn install
-```
+# ⚽트러블 슈팅
+## Bull Queue 대기열 생성 시 응답 문제
 
-## Running the app
+![noerror](https://github.com/cooderyg/ticketing-project/assets/123794148/da1121f0-0efd-4161-a46a-aa872c7a1747)
 
-```bash
-# development
-$ yarn run start
+#### Order 실패인 경우에도 Bull Queue에 작업이 올라가면 201코드를 응답하는 문제가 발생
 
-# watch mode
-$ yarn run start:dev
 
-# production mode
-$ yarn run start:prod
-```
+## Transaction Lock 동시성 제어 중 DeadLock 발생
 
-## Test
+![deadlock](https://github.com/cooderyg/ticketing-project/assets/123794148/75d5e83b-0aa5-44d9-a447-ecb2f768333d)
 
-```bash
-# unit tests
-$ yarn run test
+#### Seat에 lock하고 있는 Transaction과 User에 Lock하고 있는 Transaction이 서로 대기하고 있는 상태로 DeadLock 발생 
 
-# e2e tests
-$ yarn run test:e2e
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/0624ab40-e114-4527-a857-37337d4e9502" width="100%" />
 
-# test coverage
-$ yarn run test:cov
-```
+### 해결방법
+#### 단방향으로 Transaction Lock이 걸리도록 코드 수정 
 
-## Support
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/a1f7ce7c-861a-4a54-aabf-6da470f734e1" width="100%" />
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+## 티켓팅 프로젝트를 통한 학습 블로깅
+#### [[TIL] 티켓팅 프로젝트](https://cooder.tistory.com/60) 
+#### [[TIL] 티켓팅 프로젝트 Nest JS Role Guard](https://cooder.tistory.com/61) 
+#### [[TIL] Promise all & transaction](https://cooder.tistory.com/62) 
+#### [[TIL] 티켓팅 프로젝트 Jmeter 동시성 테스트](https://cooder.tistory.com/63) 
+#### [[TIL] 티켓팅 프로젝트 데드 락](https://cooder.tistory.com/64) 
+#### [[TIL] 티켓팅 프로젝트 Nest JS Bull Queue](https://cooder.tistory.com/65) 
+#### [[TIL] 티켓팅 프로젝트 Nest JS Event Emitter](https://cooder.tistory.com/66) 
+#### [[TIL] 티켓팅 프로젝트 bull board](https://cooder.tistory.com/67) 
+#### [[TIL] 티켓팅 프로젝트 Nest JS socket IO](https://cooder.tistory.com/68)
