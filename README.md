@@ -1,4 +1,4 @@
-# 🎟️티켓팅 프로젝트
+# 🎟️ Stage Pick (공연 예매)
 
 ## ⏰개발 기간
 2023.07.25 - 2023.08.04
@@ -109,7 +109,7 @@ export class OrderQueuesService {
 <img src="https://github.com/cooderyg/ticketing-project/assets/123794148/e0f53ea6-962a-4b87-bd14-9876d4cc2130" width="100%" />
 
 
-## 🧑‍💻티켓팅 프로젝트를 통한 학습 블로깅
+## ✍️티켓팅 프로젝트를 통한 학습 블로깅
 <a href="https://cooder.tistory.com/60">[TIL] 티켓팅 프로젝트</a>
 
 <a href="https://cooder.tistory.com/61">[TIL] 티켓팅 프로젝트 Nest JS Role Guard</a> 
