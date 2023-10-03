@@ -26,6 +26,11 @@ export interface IUserServiceUpdateNickname {
   updateNicknameDto: UpdateNicknameDto;
 }
 
+export interface IUsersServiceUpdateProfileImageUrl {
+  userId: string;
+  profileImageUrl: string;
+}
+
 export interface IUsersServiceUserPointTransaction {
   manager: EntityManager;
   user: User;

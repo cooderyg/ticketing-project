@@ -8,6 +8,7 @@ import {
   IUsersServiceFindOneByEmail,
   IUsersServiceFindProfile,
   IUsersServiceFindUsersById,
+  IUsersServiceUpdateProfileImageUrl,
   IUsersServiceUserPointTransaction,
 } from './interfaces/users-service.interface';
 @Injectable()
@@ -55,6 +56,12 @@ export class UsersService {
     const updatedUser = await this.usersRepository.updateNickname({ userId, nickname });
 
     return updatedUser;
+  }
+
+  async updateProfileImageUrl({ userId, profileImageUrl }: IUsersServiceUpdateProfileImageUrl): Promise<void> {
+    const user = await this.findProfile({ userId });
+
+    await this.usersRepository.updateProfileImageUrl({ user, profileImageUrl });
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersServiceUserPointTransaction): Promise<void> {

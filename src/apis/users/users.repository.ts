@@ -8,6 +8,7 @@ import {
   IUsersRepositoryCreateUser,
   IUsersRepositoryFindOneByEmail,
   IUsersRepositoryFindUsersById,
+  IUsersRepositoryUpdateProfileImageUrl,
   IUsersRepositoryUserPointTransaction,
 } from './interfaces/users-repository.interface';
 
@@ -57,6 +58,10 @@ export class UsersRepository {
       id: userId,
       nickname,
     });
+  }
+
+  async updateProfileImageUrl({ user, profileImageUrl }: IUsersRepositoryUpdateProfileImageUrl): Promise<void> {
+    await this.usersRepository.update(user, { profileImageUrl });
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersRepositoryUserPointTransaction): Promise<void> {

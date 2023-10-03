@@ -27,6 +27,11 @@ export interface IUserRepositoryUpdateNickname {
   nickname: string;
 }
 
+export interface IUsersRepositoryUpdateProfileImageUrl {
+  user: User;
+  profileImageUrl: string;
+}
+
 export interface IUsersRepositoryUserPointTransaction {
   manager: EntityManager;
   user: User;
