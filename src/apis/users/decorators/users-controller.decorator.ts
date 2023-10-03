@@ -1,7 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ApiGetResponse, ApiPostResponse } from 'src/commons/decorators/swagger.decorator';
-import { CreateUserResDto, findProfileResDto } from '../dto/res.dto';
+import { CreateUserResDto, FindProfileResDto, UpdateNicknameResDto } from '../dto/res.dto';
 
 export const CreateUserDocs = () => {
   return applyDecorators(
@@ -12,7 +12,15 @@ export const CreateUserDocs = () => {
 
 export const FindProfileDocs = () => {
   return applyDecorators(
-    ApiGetResponse(findProfileResDto), //
+    ApiGetResponse(FindProfileResDto), //
+    ApiResponse({ status: 404, description: '해당 유저를 찾을 수 없습니다.' }),
+    ApiBearerAuth(),
+  );
+};
+
+export const updateNicknameDocs = () => {
+  return applyDecorators(
+    ApiGetResponse(UpdateNicknameResDto), //
     ApiResponse({ status: 404, description: '해당 유저를 찾을 수 없습니다.' }),
     ApiBearerAuth(),
   );
