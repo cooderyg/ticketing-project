@@ -36,6 +36,10 @@ export class User {
   @Column({ type: 'enum', enum: ROLE, default: ROLE.USER })
   role: ROLE;
 
+  @ApiProperty({ nullable: true, example: 'imageurl.png' })
+  @Column({ nullable: true })
+  profileImageUrl: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

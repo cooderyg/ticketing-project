@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerOptionsFactory } from './multer.options.factory';
 import { UploadsService } from './uploads.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { UploadsService } from './uploads.service';
       useFactory: multerOptionsFactory,
       inject: [ConfigService],
     }),
+    UsersModule,
   ],
   controllers: [UploadsController],
   providers: [UploadsService],
