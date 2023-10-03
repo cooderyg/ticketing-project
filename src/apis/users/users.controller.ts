@@ -5,7 +5,7 @@ import { AccessAuthGuard } from '../auth/guard/auth.guard';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
 import { CreateUserResDto, FindProfileResDto, UpdateNicknameResDto } from './dto/res.dto';
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
-import { CreateUserDocs, FindProfileDocs } from './decorators/users-controller.decorator';
+import { CreateUserDocs, FindProfileDocs, updateNicknameDocs } from './decorators/users-controller.decorator';
 import { UpdateNicknameDto } from './dto/update-nickname.dto';
 
 @ApiExtraModels(CreateUserResDto, FindProfileResDto, UpdateNicknameResDto)
@@ -35,6 +35,7 @@ export class UsersController {
     return await this.usersService.findProfile({ userId });
   }
 
+  @updateNicknameDocs()
   @UseGuards(AccessAuthGuard)
   @Put('/nickname')
   async updateNickname(@User() user: UserAfterAuth, @Body() updateNicknameDto: UpdateNicknameDto): Promise<UpdateNicknameResDto> {
