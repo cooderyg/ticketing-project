@@ -35,7 +35,7 @@ export class ConcertsService {
     return concert;
   }
 
-  async findConcerts({ page, size }: IConcertsServiceFindConcerts): Promise<Concert[]> {
+  async findConcerts({ page, size }: IConcertsServiceFindConcerts): Promise<[Concert[], number]> {
     return await this.concertsRepository.findConcerts({ page, size });
   }
 
@@ -45,7 +45,7 @@ export class ConcertsService {
     return result;
   }
 
-  async searchByNameAndCategory({ keyword, page, size }: IConcertsServiceSearchByNameAndCategory): Promise<Concert[]> {
+  async searchByNameAndCategory({ keyword, page, size }: IConcertsServiceSearchByNameAndCategory): Promise<[Concert[], number]> {
     return await this.concertsRepository.searchByNameAndCategory({ keyword, page, size });
   }
 

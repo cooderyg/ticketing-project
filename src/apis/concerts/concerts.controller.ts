@@ -35,14 +35,16 @@ export class ConcertsController {
 
   @ApiGetItemsResponse(FindConcertsResDto)
   @Get()
-  findConcerts(
+  async findConcerts(
     @Query() { page, size }: PageReqDto, //
-  ): Promise<FindConcertsResDto[]> {
-    return this.concertsService.findConcerts({ page, size });
+  ): Promise<FindConcertsResDto> {
+    const concertsAndCount = await this.concertsService.findConcerts({ page, size });
+
+    return { concertsAndCount };
   }
 
   @ApiGetResponse(Concert)
-  @Get('/:concertId')
+  @Get('details/:concertId')
   async findById(
     @Param('concertId') concertId: string, //
   ): Promise<Concert> {
@@ -52,10 +54,12 @@ export class ConcertsController {
 
   @ApiGetItemsResponse(FindConcertsResDto)
   @Get('/search')
-  searchByNameAndCategory(
+  async searchByNameAndCategory(
     @Query() { page, keyword, size }: SearchReqDto, //
-  ): Promise<FindConcertsResDto[]> {
-    return this.concertsService.searchByNameAndCategory({ keyword, page, size });
+  ): Promise<FindConcertsResDto> {
+    const concertsAndCount = await this.concertsService.searchByNameAndCategory({ keyword, page, size });
+
+    return { concertsAndCount };
   }
 
   @UpdateConcertDocs()
