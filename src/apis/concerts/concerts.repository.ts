@@ -45,7 +45,7 @@ export class ConcertsRepository {
 
   //-----------------------------조회-----------------------------//
 
-  async findConcerts({ page, size }: IConcertsRepositoryFindConcerts): Promise<Concert[]> {
+  async findConcerts({ page, size }: IConcertsRepositoryFindConcerts): Promise<[Concert[], number]> {
     return await this.concertsRepository // 카테고리 이름, 콘서트 이름, 좌석정보? 이건필요? 상세 때만 넣기?
       .createQueryBuilder('concert')
       .select([
@@ -64,7 +64,7 @@ export class ConcertsRepository {
       .orderBy({ 'concert.createdAt': 'DESC' })
       .take(size)
       .skip((page - 1) * size)
-      .getMany();
+      .getManyAndCount();
   }
 
   async findById({ concertId }: IConcertsRepositoryFindById): Promise<Concert> {
@@ -88,7 +88,7 @@ export class ConcertsRepository {
       .getOne();
   }
 
-  async searchByNameAndCategory({ keyword, page, size }: IConcertsRepositorySearchByNameAndCategory): Promise<Concert[]> {
+  async searchByNameAndCategory({ keyword, page, size }: IConcertsRepositorySearchByNameAndCategory): Promise<[Concert[], number]> {
     return await this.concertsRepository
       .createQueryBuilder('concert')
       .select([
@@ -108,7 +108,7 @@ export class ConcertsRepository {
       .orderBy({ 'concert.createdAt': 'DESC' })
       .take(size)
       .skip((page - 1) * size)
-      .getMany();
+      .getManyAndCount();
   }
 
   //-----------------------------수정-----------------------------//

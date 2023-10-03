@@ -13,11 +13,15 @@ export class CreateConcertResDto extends OmitType(Concert, ['category', 'seats',
 }
 
 export class FindByIdResDto extends Concert {}
-export class FindConcertsResDto extends OmitType(Concert, ['updatedAt', 'deletedAt', 'orders', 'seats', 'category', 'user']) {
+export class Concerts extends OmitType(Concert, ['updatedAt', 'deletedAt', 'orders', 'seats', 'category', 'user']) {
   @ApiProperty({ example: '{ name: "뮤지컬" }', description: '카테고리 이름', required: true })
   category: {
     name: string;
   };
+}
+
+export class FindConcertsResDto {
+  concertsAndCount: [Concerts[], number];
 }
 
 export class UpdateConcertResDto extends CreateConcertResDto {}
