@@ -15,6 +15,7 @@ import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import { LoggerMiddleware } from './commons/middlewares/logger.middleware';
 import { EventsModule } from './apis/events/events.module';
+import { UploadsModule } from './apis/uploads/uploads.module';
 @Module({
   imports: [
     AuthModule,
@@ -23,6 +24,7 @@ import { EventsModule } from './apis/events/events.module';
     EventsModule,
     SeatsModule,
     OrdersModule,
+    UploadsModule,
     UsersModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({

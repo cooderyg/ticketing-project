@@ -16,14 +16,14 @@ services:
       - './.env.docker'
 
   # 가상컴퓨터 이름
-  my-database:
-    # DB실행오류발생시 cpu문제해결 platform: linux/86_64
-    image: mysql:latest
-    environment:
-      MYSQL_DATABASE: 'mydocker'
-      MYSQL_ROOT_PASSWORD: 'root'
-    ports:
-      - 3306:3306
+  # my-database:
+  #   # DB실행오류발생시 cpu문제해결 platform: linux/86_64
+  #   image: mysql:latest
+  #   environment:
+  #     MYSQL_DATABASE: 'mydocker'
+  #     MYSQL_ROOT_PASSWORD: 'root'
+  #   ports:
+  #     - 3306:3306
 
   # 가상컴퓨터 이름
   my-redis:
