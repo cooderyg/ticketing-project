@@ -1,6 +1,7 @@
 import { EntityManager } from 'typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
+import { UpdateNicknameDto } from '../dto/update-nickname.dto';
 
 export interface IUsersServiceCreateUser {
   createUserDto: CreateUserDto;
@@ -18,6 +19,11 @@ export interface IUsersServiceFindUsersById {
   manager: EntityManager;
   userIds: string[];
   isQueue: boolean;
+}
+
+export interface IUserServiceUpdateNickname {
+  userId: string;
+  updateNicknameDto: UpdateNicknameDto;
 }
 
 export interface IUsersServiceUserPointTransaction {

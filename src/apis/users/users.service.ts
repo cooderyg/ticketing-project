@@ -3,6 +3,7 @@ import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import {
+  IUserServiceUpdateNickname,
   IUsersServiceCreateUser,
   IUsersServiceFindOneByEmail,
   IUsersServiceFindProfile,
@@ -44,6 +45,16 @@ export class UsersService {
 
   async findUsersWithManager({ manager, userIds, isQueue }: IUsersServiceFindUsersById): Promise<User[]> {
     return await this.usersRepository.findUsersWithManager({ manager, userIds, isQueue });
+  }
+
+  async updateNickname({ userId, updateNicknameDto }: IUserServiceUpdateNickname): Promise<User> {
+    const { nickname } = updateNicknameDto;
+
+    await this.findProfile({ userId });
+
+    const updatedUser = await this.usersRepository.updateNickname({ userId, nickname });
+
+    return updatedUser;
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersServiceUserPointTransaction): Promise<void> {

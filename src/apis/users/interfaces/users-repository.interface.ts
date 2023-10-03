@@ -22,6 +22,11 @@ export interface IUsersRepositoryFindUsersById {
   isQueue: boolean;
 }
 
+export interface IUserRepositoryUpdateNickname {
+  userId: string;
+  nickname: string;
+}
+
 export interface IUsersRepositoryUserPointTransaction {
   manager: EntityManager;
   user: User;

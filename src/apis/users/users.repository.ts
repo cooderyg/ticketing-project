@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   IUserRepositoryFindProfile,
+  IUserRepositoryUpdateNickname,
   IUsersRepositoryCreateUser,
   IUsersRepositoryFindOneByEmail,
   IUsersRepositoryFindUsersById,
@@ -49,6 +50,13 @@ export class UsersRepository {
         lock: { mode: 'pessimistic_write' },
       });
     }
+  }
+
+  async updateNickname({ userId, nickname }: IUserRepositoryUpdateNickname): Promise<User> {
+    return await this.usersRepository.save({
+      id: userId,
+      nickname,
+    });
   }
 
   async userPointTransaction({ manager, user, hostUser, amount, isCancel }: IUsersRepositoryUserPointTransaction): Promise<void> {
