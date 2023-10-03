@@ -1,13 +1,14 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AccessAuthGuard } from '../auth/guard/auth.guard';
 import { ApiExtraModels, ApiTags } from '@nestjs/swagger';
-import { CreateUserResDto, findProfileResDto } from './dto/res.dto';
+import { CreateUserResDto, FindProfileResDto, UpdateNicknameResDto } from './dto/res.dto';
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 import { CreateUserDocs, FindProfileDocs } from './decorators/users-controller.decorator';
+import { UpdateNicknameDto } from './dto/update-nickname.dto';
 
-@ApiExtraModels(CreateUserResDto, findProfileResDto)
+@ApiExtraModels(CreateUserResDto, FindProfileResDto, UpdateNicknameResDto)
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
@@ -29,8 +30,15 @@ export class UsersController {
   @Get('/profile')
   async findProfile(
     @User() user: UserAfterAuth, //
-  ): Promise<findProfileResDto> {
+  ): Promise<FindProfileResDto> {
     const userId = user.id;
     return await this.usersService.findProfile({ userId });
+  }
+
+  @UseGuards(AccessAuthGuard)
+  @Put('/nickname')
+  async updateNickname(@User() user: UserAfterAuth, @Body() updateNicknameDto: UpdateNicknameDto): Promise<UpdateNicknameResDto> {
+    const userId = user.id;
+    return await this.usersService.updateNickname({ userId, updateNicknameDto });
   }
 }
