@@ -2,9 +2,14 @@ import { EntityManager } from 'typeorm';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from '../entities/user.entity';
 import { UpdateNicknameDto } from '../dto/update-nickname.dto';
+import { VerifyEmailDto } from '../dto/verify-email.dto';
 
 export interface IUsersServiceCreateUser {
   createUserDto: CreateUserDto;
+}
+
+export interface IUsersServiceVerifyEmail {
+  verifyEmailDto: VerifyEmailDto;
 }
 
 export interface IUsersServiceFindOneByEmail {
