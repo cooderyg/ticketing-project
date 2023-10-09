@@ -7,6 +7,7 @@ import { CreateUserResDto, FindProfileResDto, UpdateNicknameResDto } from './dto
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 import { CreateUserDocs, FindProfileDocs, updateNicknameDocs } from './decorators/users-controller.decorator';
 import { UpdateNicknameDto } from './dto/update-nickname.dto';
+import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @ApiExtraModels(CreateUserResDto, FindProfileResDto, UpdateNicknameResDto)
 @ApiTags('users')
@@ -23,6 +24,13 @@ export class UsersController {
   ): Promise<CreateUserResDto> {
     const { id, email, nickname, point } = await this.usersService.createUser({ createUserDto });
     return { id, email, nickname, point };
+  }
+
+  @Post('verify-email')
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto): Promise<{ number: number }> {
+    const number = await this.usersService.verifyEmail({ verifyEmailDto });
+
+    return { number };
   }
 
   @FindProfileDocs()

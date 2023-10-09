@@ -1,4 +1,4 @@
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
@@ -10,11 +10,15 @@ import {
   IUsersServiceFindUsersById,
   IUsersServiceUpdateProfileImageUrl,
   IUsersServiceUserPointTransaction,
+  IUsersServiceVerifyEmail,
 } from './interfaces/users-service.interface';
+import { createNumber } from 'src/commons/libs/create-number';
+import { MailService } from '../mail/mail.service';
 @Injectable()
 export class UsersService {
   constructor(
-    private readonly usersRepository: UsersRepository, //
+    private readonly mailService: MailService, //
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async createUser({ createUserDto }: IUsersServiceCreateUser): Promise<User> {
@@ -32,6 +36,18 @@ export class UsersService {
       role,
     });
     return newUser;
+  }
+
+  async verifyEmail({ verifyEmailDto }: IUsersServiceVerifyEmail): Promise<number> {
+    const { email } = verifyEmailDto;
+    const isExist = await this.usersRepository.findOneByEmail({ email });
+    if (isExist) throw new ConflictException('이미 가입한 이메일입니다.');
+
+    const number: number = createNumber();
+
+    await this.mailService.sendMail({ email, number });
+
+    return number;
   }
 
   async findOneByEmail({ email }: IUsersServiceFindOneByEmail): Promise<User> {

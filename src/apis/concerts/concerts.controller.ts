@@ -40,7 +40,7 @@ export class ConcertsController {
   ): Promise<FindConcertsResDto> {
     const concertsAndCount = await this.concertsService.findConcerts({ page, size });
 
-    return { concertsAndCount };
+    return { concerts: concertsAndCount[0], count: concertsAndCount[1] };
   }
 
   @ApiGetResponse(Concert)
@@ -59,7 +59,7 @@ export class ConcertsController {
   ): Promise<FindConcertsResDto> {
     const concertsAndCount = await this.concertsService.searchByNameAndCategory({ keyword, page, size });
 
-    return { concertsAndCount };
+    return { concerts: concertsAndCount[0], count: concertsAndCount[1] };
   }
 
   @UpdateConcertDocs()

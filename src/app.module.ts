@@ -16,12 +16,15 @@ import { ExpressAdapter } from '@bull-board/express';
 import { LoggerMiddleware } from './commons/middlewares/logger.middleware';
 import { EventsModule } from './apis/events/events.module';
 import { UploadsModule } from './apis/uploads/uploads.module';
+import { MailModule } from './apis/mail/mail.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 @Module({
   imports: [
     AuthModule,
     CategoriesModule,
     ConcertsModule,
     EventsModule,
+    MailModule,
     SeatsModule,
     OrdersModule,
     UploadsModule,
@@ -49,6 +52,17 @@ import { UploadsModule } from './apis/uploads/uploads.module';
       adapter: ExpressAdapter,
     }),
     EventEmitterModule.forRoot(),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAILER_HOST,
+        port: Number(process.env.MAILER_PORT),
+        auth: {
+          user: process.env.MAILER_USER,
+          pass: process.env.MAILER_PASS,
+        },
+      },
+      preview: false,
+    }),
   ],
   controllers: [
     AppController, //
