@@ -4,3 +4,4 @@
 .env
 .env.docker
 .gitmessage.txt
+yarn.lock
