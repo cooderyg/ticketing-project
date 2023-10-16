@@ -12,8 +12,11 @@ export class LoginResDto {
 }
 
 export class RefreshResDto {
-  @ApiProperty({ required: true, example: 'refresh' })
-  message: string;
+  // @ApiProperty({ required: true, example: 'refresh' })
+  // message: string;
+
+  @ApiProperty({ required: true, example: 'JWTtoken' })
+  accessToken: string;
 }
 
 export class LogoutResDto {

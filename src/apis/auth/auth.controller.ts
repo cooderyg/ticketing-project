@@ -8,6 +8,7 @@ import { LogInDocs, LogoutDocs, RefreshDocs } from './decorators/auth-controller
 import { User, UserAfterAuth } from 'src/commons/decorators/user.decoreator';
 import { AccessAuthGuard, RefreshAuthGuard } from './guard/auth.guard';
 import { IRequest } from 'src/commons/interfaces/context';
+import { RefreshDto } from './dto/refresh.dto';
 
 @ApiExtraModels(LoginResDto, RefreshResDto, LogoutResDto)
 @ApiTags('auth')
@@ -49,13 +50,17 @@ export class AuthController {
   @Post('refresh')
   async refresh(
     @Req() req: IRequest, //
-    @Res({ passthrough: true }) res: Response,
+    // @Res({ passthrough: true }) res: Response,
+    @Body() refreshDto: RefreshDto,
     @User() user: UserAfterAuth,
   ): Promise<RefreshResDto> {
-    const token = req.cookies['refreshToken'];
+    // const token = req.cookies['refreshToken'];
+
+    const { refreshToken: token } = refreshDto;
+    console.log(token);
     const accessToken = await this.authService.refresh({ token, user });
-    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    // res.setHeader('Authorization', `Bearer ${accessToken}`);
     console.log(accessToken);
-    return { message: 'refresh' };
+    return { accessToken };
   }
 }
