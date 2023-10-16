@@ -21,14 +21,14 @@ export class AuthController {
   @Post('/login')
   async logIn(
     @Body() loginDto: LoginDto, //
-    @Res({ passthrough: true }) res: Response,
+    // @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResDto> {
     const { accessToken, refreshToken } = await this.authService.login({ loginDto });
-    res.cookie('refreshToken', refreshToken);
-    // , { httpOnly: true, secure: true }
-    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    // res.cookie('refreshToken', refreshToken);
+    // // , { httpOnly: true, secure: true }
+    // res.setHeader('Authorization', `Bearer ${accessToken}`);
     console.log(accessToken);
-    return { message: '로그인을 성공적으로 완료하였습니다.' };
+    return { accessToken, refreshToken };
   }
 
   @LogoutDocs()
