@@ -24,12 +24,18 @@ export class AuthController {
     @Body() loginDto: LoginDto, //
     // @Res({ passthrough: true }) res: Response,
   ): Promise<LoginResDto> {
-    const { accessToken, refreshToken } = await this.authService.login({ loginDto });
+    const { accessToken, refreshToken, user } = await this.authService.login({ loginDto });
     // res.cookie('refreshToken', refreshToken);
     // // , { httpOnly: true, secure: true }
     // res.setHeader('Authorization', `Bearer ${accessToken}`);
-    console.log(accessToken);
-    return { accessToken, refreshToken };
+
+    const userInfo = {
+      nickname: user.nickname,
+      profileImageUrl: user.profileImageUrl,
+      point: user.point,
+    };
+
+    return { accessToken, refreshToken, userInfo };
   }
 
   @LogoutDocs()

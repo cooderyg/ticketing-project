@@ -13,6 +13,7 @@ export interface IAuthServiceGetAccessToken {
 export interface IAuthServiceLoginReturn {
   accessToken: string;
   refreshToken: string;
+  user: User;
 }
 
 export interface IAuthServiceRefresh {

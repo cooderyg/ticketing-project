@@ -1,11 +1,12 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { Strategy } from 'passport-jwt';
 
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   constructor() {
     super({
-      jwtFromRequest: (req) => {
+      jwtFromRequest: (req: Request) => {
         const refreshToken = req.body.refreshToken;
         // const cookie = req.headers.cookie; //refreshToken=pvgkmjsklfmsk
         // const refreshToken = cookie.replace('refreshToken=', '');
