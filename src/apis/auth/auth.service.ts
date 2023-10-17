@@ -33,7 +33,7 @@ export class AuthService {
     const refreshToken = this.getRefreshToken({ userId: user.id });
     await this.createRefreshTokenEntity({ userId: user.id, refreshToken });
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, user };
   }
 
   async logout({ userId }): Promise<void> {
