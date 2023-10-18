@@ -35,7 +35,7 @@ export class UsersRepository {
   async findProfile({ userId }: IUserRepositoryFindProfile): Promise<User> {
     return await this.usersRepository
       .createQueryBuilder('user')
-      .select(['user.id', 'user.nickname', 'user.point'])
+      .select(['user.id', 'user.nickname', 'user.point', 'user.profileImageUrl', 'user.role'])
       .where('user.id = :userId', { userId })
       .getOne();
   }

@@ -33,6 +33,7 @@ export class AuthController {
       nickname: user.nickname,
       profileImageUrl: user.profileImageUrl,
       point: user.point,
+      role: user.role,
     };
 
     return { accessToken, refreshToken, userInfo };
@@ -63,10 +64,8 @@ export class AuthController {
     // const token = req.cookies['refreshToken'];
 
     const { refreshToken: token } = refreshDto;
-    console.log(token);
-    const accessToken = await this.authService.refresh({ token, user });
+
+    return await this.authService.refresh({ token, user });
     // res.setHeader('Authorization', `Bearer ${accessToken}`);
-    console.log(accessToken);
-    return { accessToken };
   }
 }
