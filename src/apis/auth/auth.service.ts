@@ -11,6 +11,7 @@ import {
 } from './interfaces/auth-service.interface';
 import { UsersService } from '../users/users.service';
 import { AuthRepository } from './auth.repository';
+import { RefreshResDto } from './dto/res.dto';
 
 @Injectable()
 export class AuthService {
@@ -49,11 +50,21 @@ export class AuthService {
     );
   }
 
-  async refresh({ token, user }: IAuthServiceRefresh): Promise<string> {
+  async refresh({ token, user }: IAuthServiceRefresh): Promise<RefreshResDto> {
     const refreshTokenEntity = await this.authRepository.findOneByToken({ token });
     if (!refreshTokenEntity) throw new BadRequestException('잘못된 요청입니다.');
 
-    return this.getAccessToken({ user });
+    const _user = await this.usersService.findProfile({ userId: user.id });
+    if (!_user) throw new BadRequestException('잘못된 요청입니다.');
+    const userInfo = {
+      nickname: _user.nickname,
+      profileImageUrl: _user.profileImageUrl,
+      point: _user.point,
+      role: _user.role,
+    };
+    const accessToken = this.getAccessToken({ user });
+
+    return { accessToken, userInfo };
   }
 
   private getRefreshToken({ userId }: IAuthServiceGetRefreshToken): string {
