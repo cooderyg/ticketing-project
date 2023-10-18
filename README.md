@@ -11,6 +11,10 @@
 - Bull Queue
 - Socket.IO
 
+## ⚒️아키텍쳐
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/f60c81d7-e15a-475a-8574-bcade633f170" width="100%" />
+
+
 ## 📌주요 기능
 - 공연좌석 지정예매 기능
 - 등급별 공연좌석 생성 기능
