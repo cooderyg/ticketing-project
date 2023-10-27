@@ -28,8 +28,9 @@ export class ConcertsController {
     @Body() createConcertDto: CreateConcertDto,
   ): Promise<CreateConcertResDto> {
     const userId = req.user.id;
-
     const concert = this.concertsService.create({ userId, createConcertDto });
+
+    // TODO: id만 반환하기
     return concert;
   }
 

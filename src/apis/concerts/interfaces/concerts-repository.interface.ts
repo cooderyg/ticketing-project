@@ -1,13 +1,8 @@
+import { CreateConcertDto } from '../dto/create-concert.dto';
+
 export interface IConcertsRepositoryCreate {
   userId: string;
-  name: string;
-  categoryId: string;
-  address: string;
-  description: string;
-  imageUrl: string;
-  endDate: Date;
-  startDate: Date;
-  concertDate: Date;
+  createConcertDto: CreateConcertDto;
 }
 export interface IConcertsRepositoryFindConcerts {
   page: number;

@@ -21,25 +21,13 @@ export class ConcertsRepository {
 
   async create({
     userId, //
-    categoryId,
-    name,
-    address,
-    description,
-    imageUrl,
-    endDate,
-    startDate,
-    concertDate,
+    createConcertDto,
   }: IConcertsRepositoryCreate): Promise<Concert> {
+    const { categoryId, ...rest } = createConcertDto;
     return await this.concertsRepository.save({
       user: { id: userId },
       category: { id: categoryId },
-      name,
-      address,
-      description,
-      imageUrl,
-      concertDate,
-      startDate,
-      endDate,
+      ...rest,
     });
   }
 
@@ -53,6 +41,7 @@ export class ConcertsRepository {
         'concert.name',
         'concert.description',
         'concert.address',
+        'concert.ageLimit',
         'concert.startDate',
         'concert.endDate',
         'concert.concertDate',
@@ -96,6 +85,7 @@ export class ConcertsRepository {
         'concert.name',
         'concert.description',
         'concert.address',
+        'concert.ageLimit',
         'concert.startDate',
         'concert.endDate',
         'concert.concertDate',
