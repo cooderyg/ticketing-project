@@ -27,6 +27,13 @@ import {
 //   orderStatus: ORDERSTATE;
 // }
 
+export enum AGEKLIMIT {
+  ZERO = 'ZERO',
+  SEVEN = 'SEVEN',
+  FIFTEEN = 'FIFTEEN',
+  NINETEEN = 'NINETEEN',
+}
+
 @Entity()
 export class Concert {
   @ApiProperty({ example: 'uuid', required: true })
@@ -48,6 +55,13 @@ export class Concert {
   @ApiProperty({ example: '서울특별시 중구 세종대왕로 10번길', required: true, description: '공연장소(주소)' })
   @Column()
   address: string;
+
+  @ApiProperty({ example: 100, required: true, description: '상영시간' })
+  runningTime: number;
+
+  @ApiProperty({ example: 'SEVEN', description: '제한 연령', required: true })
+  @Column({ type: 'enum', enum: AGEKLIMIT })
+  ageLimit: AGEKLIMIT;
 
   @ApiProperty({ example: '2023-07-28T21:48:33.615Z', required: true, description: '콘서트날짜' })
   @Column({ type: 'date' })

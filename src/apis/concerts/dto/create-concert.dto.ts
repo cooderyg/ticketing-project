@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsArray, IsDate, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { AGEKLIMIT } from '../entities/concert.entity';
 
 export class SeatInfoDto {
   @IsString()
@@ -31,7 +32,6 @@ export class CreateConcertDto {
 
   @ApiProperty({ required: true, example: 'image/imageurl', type: 'string' })
   @IsString()
-  @IsNotEmpty()
   imageUrl: string;
 
   @ApiProperty({ required: true, example: '서울특별시 중구 세종대왕로 11번길', type: 'string' })
@@ -39,20 +39,30 @@ export class CreateConcertDto {
   @IsNotEmpty()
   address: string;
 
+  @ApiProperty({ required: true, example: 600, type: 'number' })
+  @IsNumber()
+  @IsNotEmpty()
+  runningTime: number;
+
+  @ApiProperty({ required: true, example: 'SEVEN', type: 'enum' })
+  @IsEnum(AGEKLIMIT)
+  @IsNotEmpty()
+  ageLimit: AGEKLIMIT;
+
   @ApiProperty({ required: true, example: 1691636400, type: 'number' })
-  @Transform((param) => new Date(param.value * 1000))
+  @Transform((param) => new Date(param.value))
   @IsDate()
   @IsNotEmpty()
   startDate: Date;
 
   @ApiProperty({ required: true, example: 1691636400, type: 'number' })
-  @Transform((param) => new Date(param.value * 1000))
+  @Transform((param) => new Date(param.value))
   @IsDate()
   @IsNotEmpty()
   endDate: Date;
 
   @ApiProperty({ required: true, example: 1691636400, type: 'number' })
-  @Transform((param) => new Date(param.value * 1000))
+  @Transform((param) => new Date(param.value))
   @IsDate()
   @IsNotEmpty()
   concertDate: Date;
