@@ -27,7 +27,7 @@
 
 ## 📐ERD 설계
 
-<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/bac3b0e2-7c12-4cc4-984f-1390dba3b2b8" width="100%">
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/5ec5a87f-5a82-48a1-bf76-6479ad8a4b13" width="100%">
 
 # ⚽트러블 슈팅
 ## Bull Queue 대기열 생성 시 응답 문제
