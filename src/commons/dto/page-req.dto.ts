@@ -11,7 +11,7 @@ export class PageReqDto {
   @ApiPropertyOptional({ description: '페이지 당 갯수 default 20개' })
   @Transform((param) => Number(param.value))
   @IsInt()
-  size?: number = 20;
+  size?: number = 18;
 }
 
 export class SearchReqDto extends PageReqDto {

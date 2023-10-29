@@ -8,6 +8,7 @@ import {
   IConcertsServiceFindConcerts,
   IConcertsServiceSearchByNameAndCategory,
 } from './interfaces/concerts-service.interface';
+import { FindConcertsResDto } from './dto/res.dto';
 
 @Injectable()
 export class ConcertsService {
@@ -27,8 +28,10 @@ export class ConcertsService {
     return concert;
   }
 
-  async findConcerts({ page, size }: IConcertsServiceFindConcerts): Promise<[Concert[], number]> {
-    return await this.concertsRepository.findConcerts({ page, size });
+  async findConcerts({ page, size }: IConcertsServiceFindConcerts): Promise<FindConcertsResDto> {
+    const concertAndCount = await this.concertsRepository.findConcerts({ page, size });
+
+    return { concerts: concertAndCount[0], count: concertAndCount[1], page, hasNextPage: concertAndCount[1] / size > page ? true : false };
   }
 
   async findById({ concertId }: IConcertsServiceFindById) {
@@ -37,8 +40,9 @@ export class ConcertsService {
     return result;
   }
 
-  async searchByNameAndCategory({ keyword, page, size }: IConcertsServiceSearchByNameAndCategory): Promise<[Concert[], number]> {
-    return await this.concertsRepository.searchByNameAndCategory({ keyword, page, size });
+  async searchByNameAndCategory({ keyword, page, size }: IConcertsServiceSearchByNameAndCategory): Promise<FindConcertsResDto> {
+    const concertAndCount = await this.concertsRepository.searchByNameAndCategory({ keyword, page, size });
+    return { concerts: concertAndCount[0], count: concertAndCount[1], page, hasNextPage: concertAndCount[1] / size > page ? true : false };
   }
 
   async updateConcert({ updateConcertDto, concertId, userId }) {

@@ -24,6 +24,7 @@ export class ConcertsRepository {
     createConcertDto,
   }: IConcertsRepositoryCreate): Promise<Concert> {
     const { categoryId, ...rest } = createConcertDto;
+
     return await this.concertsRepository.save({
       user: { id: userId },
       category: { id: categoryId },
