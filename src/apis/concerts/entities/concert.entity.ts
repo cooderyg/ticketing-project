@@ -57,6 +57,7 @@ export class Concert {
   address: string;
 
   @ApiProperty({ example: 100, required: true, description: '상영시간' })
+  @Column()
   runningTime: number;
 
   @ApiProperty({ example: 'SEVEN', description: '제한 연령', required: true })

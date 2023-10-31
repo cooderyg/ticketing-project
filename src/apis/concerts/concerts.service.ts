@@ -17,10 +17,11 @@ export class ConcertsService {
     private readonly seatsService: SeatsService, //
   ) {}
   async create({ userId, createConcertDto }: IConcertsServiceCreate): Promise<Concert> {
-    const { seatInfo } = createConcertDto;
+    const { seatInfo, ...saveConcertDto } = createConcertDto;
+
     const concert = await this.concertsRepository.create({
       userId,
-      createConcertDto,
+      saveConcertDto,
     });
 
     await this.seatsService.creat({ concertId: concert.id, seatInfo });
