@@ -9,6 +9,6 @@ import { SeatsContoller } from './seats.controller';
   imports: [TypeOrmModule.forFeature([Seat])],
   controllers: [SeatsContoller],
   providers: [SeatsService, SeatsRepository],
-  exports: [SeatsService],
+  exports: [SeatsService, SeatsRepository],
 })
 export class SeatsModule {}

@@ -21,9 +21,9 @@ export class ConcertsRepository {
 
   async create({
     userId, //
-    createConcertDto,
+    saveConcertDto,
   }: IConcertsRepositoryCreate): Promise<Concert> {
-    const { categoryId, ...rest } = createConcertDto;
+    const { categoryId, ...rest } = saveConcertDto;
 
     return await this.concertsRepository.save({
       user: { id: userId },
