@@ -12,7 +12,7 @@
 - Socket.IO
 
 ## ⚒️아키텍쳐
-<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/f60c81d7-e15a-475a-8574-bcade633f170" width="100%" />
+<img src="https://github.com/cooderyg/ticketing-project/assets/123794148/9a877c38-f2c9-46e5-b375-1d72bf2fbbbc" width="100%" />
 
 
 ## 📌주요 기능
